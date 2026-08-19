@@ -1,0 +1,140 @@
+# AI_FDE pipeline declaration — 13-stage design and governance chain.
+#
+# Discovery -> SCQA -> Risk Classification -> PRD -> Domain Model -> Feature Specs ->
+# Architecture -> Security Model -> Decisions -> Compliance Controls -> Technical Design ->
+# Lean/DMAIC -> Solution Proposal.
+#
+# This chain deliberately ends at the design/build boundary: it produces a complete
+# specification and governance pack, not a built system. There is no implementation-tasks
+# stage and no post-build assurance stage in this pipeline -- see docs/PIPELINE-UPGRADE-PLAN.md
+# for why, and for how build evidence can be fed back in as a second run if ever needed.
+#
+# Adding, reordering, or removing a stage is a config edit here plus a prompt file under
+# Prompts/stages/ and Prompts/validators/ -- no Python changes.
+#
+# Gate policy: a stage with no auto_approve_on_pass is a mandatory approval gate in stepwise
+# mode -- it always pauses for a human decision, regardless of score, because it emits a verdict
+# a human must own (a risk tier, an architecture review, a compliance gate, a structural-reopen
+# decision, or the final sponsor sign-off). Every other stage is structural: in stepwise mode it
+# only pauses when the validator did not pass it cleanly. auto mode (no human in the loop at all)
+# is unaffected by this either way -- see graph.py's gate_node.
+
+version: 1
+
+shared:
+  system: shared.system
+  house_style: shared.house_style
+  validator_system: shared.validator_system
+
+repair:
+  prompt: repair.default
+
+stages:
+  - id: discovery
+    order: 1
+    generator: stage.discovery
+    validator: validator.discovery
+    artifact_filename: 01-discovery.md
+    # Mandatory gate: the declared framing mode (decision-ready | hypothesis) is a call
+    # every later stage inherits, and the prompt itself says a reviewer may override it.
+
+  - id: scqa
+    order: 2
+    generator: stage.scqa
+    validator: validator.scqa
+    artifact_filename: 02-scqa.md
+    depends_on: [discovery]
+    auto_approve_on_pass: true
+
+  - id: risk_classification
+    order: 3
+    generator: stage.risk_classification
+    validator: validator.risk_classification
+    artifact_filename: 03-risk.md
+    depends_on: [discovery, scqa]
+    # Mandatory gate: the EU AI Act tier and the prohibited-practice check are decisions a
+    # human must own -- never auto-advanced past, even on a clean validator pass.
+
+  - id: prd
+    order: 4
+    generator: stage.prd
+    validator: validator.prd
+    artifact_filename: 04-prd.md
+    depends_on: [scqa, risk_classification]
+    auto_approve_on_pass: true
+
+  - id: domain_model
+    order: 5
+    generator: stage.domain_model
+    validator: validator.domain_model
+    artifact_filename: 05-ddd.md
+    depends_on: [discovery, scqa, risk_classification, prd]
+    auto_approve_on_pass: true
+
+  - id: feature_specs
+    order: 6
+    generator: stage.feature_specs
+    validator: validator.feature_specs
+    artifact_filename: 06-features.md
+    depends_on: [prd, domain_model]
+    auto_approve_on_pass: true
+
+  - id: architecture
+    order: 7
+    generator: stage.architecture
+    validator: validator.architecture
+    artifact_filename: 07-c4.md
+    depends_on: [domain_model, feature_specs, risk_classification]
+    auto_approve_on_pass: true
+
+  - id: security_model
+    order: 8
+    generator: stage.security_model
+    validator: validator.security_model
+    artifact_filename: 08-security.md
+    depends_on: [risk_classification, domain_model, architecture]
+    auto_approve_on_pass: true
+
+  - id: decisions
+    order: 9
+    generator: stage.decisions
+    validator: validator.decisions
+    artifact_filename: 09-adr.md
+    depends_on: [architecture, domain_model, feature_specs, security_model]
+    # Mandatory gate: the architecture review verdict (pass | conditional | fail) is a
+    # decision a human must own before contracts and compliance work build on top of it.
+
+  - id: compliance_controls
+    order: 10
+    generator: stage.compliance_controls
+    validator: validator.compliance_controls
+    artifact_filename: 10-compliance.md
+    depends_on: [risk_classification, security_model, decisions]
+    # Mandatory gate: the compliance gate (cleared | conditional | blocked) is a decision
+    # a human must own, not something to wave through on a passing validator score.
+
+  - id: technical_design
+    order: 11
+    generator: stage.technical_design
+    validator: validator.technical_design
+    artifact_filename: 11-technical.md
+    depends_on: [feature_specs, architecture, decisions]
+    auto_approve_on_pass: true
+
+  - id: lean_dmaic
+    order: 12
+    generator: stage.lean_dmaic
+    validator: validator.lean_dmaic
+    artifact_filename: 12-lean-dmaic.md
+    # depends_on intentionally empty: this stage consolidates every prior stage's own
+    # Lean/DMAIC lens, so it genuinely needs all of them.
+    # Mandatory gate: the structural-reopen decision (cleared | blocked) can send the run
+    # back to an earlier stage -- a human must own that call.
+
+  - id: solution_proposal
+    order: 13
+    generator: stage.solution_proposal
+    validator: validator.solution_proposal
+    artifact_filename: 13-proposal.md
+    # depends_on intentionally empty: the executive synthesis draws on every prior stage.
+    # Mandatory gate: this is the sponsor-facing deliverable -- it is never auto-approved.

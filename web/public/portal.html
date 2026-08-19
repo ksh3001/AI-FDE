@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE FDE · Learning Journey Portal</title>
+<style>
+  :root{
+    --navy-950:#0f0f16;
+    --navy-900:#15151f;
+    --navy-800:#1b1c28;
+    --navy-700:#23243380;
+    --navy-700-solid:#232433;
+    --navy-600:#2e2f42;
+    --navy-500:#3c3d54;
+    --ink-100:#f4f4f7;
+    --ink-300:#c7c8d6;
+    --ink-500:#9596ab;
+    --ink-600:#7c7d92;
+    --yellow:#ffe600;
+    --yellow-dim:#c9b600;
+    --green:#4ade80;
+    --blue:#60a5fa;
+    --amber:#fbbf24;
+    --violet:#a78bfa;
+    --radius:10px;
+    --maxw:1400px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--navy-950);
+    color:var(--ink-100);
+    font-family:"Segoe UI",Inter,-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--yellow);}
+  .skip-link{
+    position:absolute; left:-999px; top:0; background:var(--yellow); color:var(--navy-950);
+    padding:.6rem 1rem; z-index:1000; font-weight:700; border-radius:0 0 8px 0;
+  }
+  .skip-link:focus{left:0;}
+
+  header.top{
+    background:var(--navy-900);
+    border-bottom:1px solid var(--navy-600);
+    padding:clamp(.65rem,2vw,1rem) clamp(.85rem,3vw,1.5rem);
+    position:sticky; top:0; z-index:50;
+  }
+  .top-inner{
+    max-width:var(--maxw); margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:.75rem; min-width:0;}
+  .brand .badge{
+    flex:0 0 auto;
+    background:var(--yellow); color:var(--navy-950); font-weight:800; font-size:clamp(.95rem,2vw,1.1rem);
+    padding:.3rem .55rem; border-radius:6px; letter-spacing:.5px;
+  }
+  .brand div{min-width:0;}
+  .brand h1{font-size:clamp(.95rem,2.2vw,1.15rem); margin:0; font-weight:700; color:var(--ink-100);}
+  .brand p{margin:0; font-size:clamp(.7rem,1.6vw,.8rem); color:var(--ink-500);}
+  .top-meta{font-size:.78rem; color:var(--ink-600); text-align:right;}
+  @media (max-width:640px){ .top-meta{display:none;} }
+
+  nav.spine{
+    background:var(--navy-900);
+    border-bottom:1px solid var(--navy-600);
+    padding:.7rem clamp(.85rem,3vw,1.5rem) .85rem;
+    position:sticky; top:var(--header-h,60px); z-index:40;
+  }
+  .spine-scroll{
+    max-width:var(--maxw); margin:0 auto;
+    display:flex; gap:.6rem; overflow-x:auto; padding-bottom:.35rem;
+    scrollbar-width:thin; scrollbar-color:var(--navy-500) transparent;
+  }
+  .spine-scroll::-webkit-scrollbar{height:6px;}
+  .spine-scroll::-webkit-scrollbar-thumb{background:var(--navy-500); border-radius:4px;}
+  .spine-item{
+    flex:0 0 auto; min-width:clamp(128px,38vw,150px); max-width:190px;
+    background:var(--navy-800); border:1px solid var(--navy-600); border-radius:var(--radius);
+    padding:.6rem .7rem; text-align:left; cursor:pointer; color:var(--ink-100);
+    font-family:inherit; transition:border-color .15s, background .15s;
+  }
+  .spine-item:hover{border-color:var(--yellow-dim); background:var(--navy-700-solid);}
+  .spine-item.active{border-color:var(--yellow); background:var(--navy-700-solid); box-shadow:0 0 0 1px var(--yellow) inset;}
+  .spine-item .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:20px; height:20px; border-radius:50%; background:var(--yellow); color:var(--navy-950);
+    font-size:.7rem; font-weight:800; margin-bottom:.4rem;
+  }
+  .spine-item h3{font-size:.82rem; margin:.15rem 0 .2rem; font-weight:700; line-height:1.25;}
+  .spine-item p{font-size:.68rem; margin:0; color:var(--ink-500); line-height:1.3;}
+
+  .layout{
+    max-width:var(--maxw); margin:0 auto; padding:clamp(.75rem,3vw,1.5rem);
+    display:grid; grid-template-columns:340px minmax(0,1fr); gap:clamp(.75rem,2.5vw,1.5rem);
+    grid-template-areas:"modules detail";
+    align-items:start;
+  }
+  @media (max-width:1150px) and (min-width:901px){
+    .layout{grid-template-columns:280px minmax(0,1fr);}
+  }
+  @media (max-width:900px){
+    .layout{grid-template-columns:minmax(0,1fr); grid-template-areas:"modules" "detail";}
+    aside.detail{position:static; max-height:none;}
+  }
+
+  main.modules{grid-area:modules; display:flex; flex-direction:column; gap:.9rem; min-width:0;}
+
+  .module-card{
+    background:var(--navy-900); border:1px solid var(--navy-600); border-radius:var(--radius);
+    overflow:hidden; scroll-margin-top:var(--sticky-top,150px);
+  }
+  .module-card.flash{animation:flash 1s ease;}
+  @keyframes flash{0%{box-shadow:0 0 0 2px var(--yellow);}100%{box-shadow:0 0 0 0 transparent;}}
+  .module-header{
+    width:100%; display:flex; align-items:center; gap:.9rem; text-align:left;
+    background:transparent; border:none; color:var(--ink-100); cursor:pointer;
+    padding:1rem 1.1rem; font-family:inherit;
+  }
+  .module-header:hover{background:var(--navy-800);}
+  .module-header .id{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%; background:var(--navy-600);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.78rem; color:var(--yellow);
+    border:1px solid var(--navy-500);
+  }
+  .module-header .text{flex:1 1 auto; min-width:0;}
+  .module-header h2{font-size:clamp(.88rem,2vw,1rem); margin:0 0 .15rem; font-weight:700; overflow-wrap:break-word;}
+  .module-header .sub{font-size:.78rem; color:var(--ink-500); margin:0; overflow-wrap:break-word;}
+  .module-header .count{font-size:.7rem; color:var(--ink-600); white-space:nowrap; margin-right:.4rem;}
+  @media (max-width:520px){ .module-header .count{display:none;} .module-header{padding:.85rem .8rem;} }
+  .chevron{
+    flex:0 0 auto; width:22px; height:22px; display:flex; align-items:center; justify-content:center;
+    transition:transform .18s;
+  }
+  .module-header[aria-expanded="true"] .chevron{transform:rotate(90deg);}
+
+  .module-body{border-top:1px solid var(--navy-600); padding:.85rem 1.1rem 1.1rem;}
+  .module-body[hidden]{display:none;}
+  @media (max-width:520px){ .module-body{padding:.75rem .8rem .9rem;} }
+
+  .day-row{padding:.6rem 0; border-bottom:1px dashed var(--navy-600);}
+  .day-row:last-child{border-bottom:none;}
+  .day-row .tag{
+    display:inline-block; font-size:.68rem; font-weight:700; color:var(--yellow); text-transform:uppercase;
+    letter-spacing:.4px; margin-right:.5rem;
+  }
+  .day-row .day-title{font-size:.85rem; color:var(--ink-300); overflow-wrap:break-word;}
+  .pending-flag{
+    display:inline-block; font-size:.62rem; font-weight:700; text-transform:uppercase;
+    color:var(--amber); border:1px solid var(--amber); border-radius:4px; padding:.05rem .35rem; margin-left:.4rem;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.5rem;}
+  .chip{
+    background:var(--navy-800); border:1px solid var(--navy-500); color:var(--ink-100);
+    font-size:.76rem; padding:.32rem .6rem; border-radius:999px; cursor:pointer; font-family:inherit;
+    transition:border-color .15s, background .15s, color .15s;
+  }
+  .chip:hover{border-color:var(--yellow-dim);}
+  .chip.active{background:var(--yellow); color:var(--navy-950); border-color:var(--yellow); font-weight:700;}
+  .chip.pending{opacity:.6; font-style:italic;}
+
+  aside.detail{
+    grid-area:detail; position:sticky; top:var(--sticky-top,150px); min-width:0;
+    background:var(--navy-900); border:1px solid var(--navy-600); border-radius:var(--radius);
+    padding:clamp(.9rem,2.5vw,1.2rem); max-height:calc(100vh - var(--sticky-top,150px) - 20px); overflow-y:auto;
+  }
+  @media (max-width:900px){ aside.detail{max-height:none;} }
+  aside.detail h2{font-size:1.05rem; margin:0 0 .3rem;}
+  .detail-placeholder{color:var(--ink-500); font-size:.88rem; padding:1.5rem 0; text-align:center;}
+  .appears-in{margin:.6rem 0 1rem; font-size:.75rem; color:var(--ink-500);}
+  .appears-in button{
+    background:var(--navy-800); border:1px solid var(--navy-500); color:var(--ink-300); font-family:inherit;
+    font-size:.72rem; padding:.2rem .5rem; border-radius:6px; cursor:pointer; margin:.15rem .25rem .15rem 0;
+  }
+  .appears-in button:hover{border-color:var(--yellow-dim); color:var(--ink-100);}
+  .day-block{border-top:1px solid var(--navy-600); padding-top:.8rem; margin-top:.8rem;}
+  .day-block:first-of-type{border-top:none; margin-top:0; padding-top:0;}
+  .day-block h3{font-size:.85rem; margin:0 0 .4rem; color:var(--ink-100);}
+  .day-block p.exp{font-size:.85rem; color:var(--ink-300); margin:.4rem 0;}
+  .day-block ul{margin:.4rem 0; padding-left:1.1rem; font-size:.82rem; color:var(--ink-300);}
+  .day-block li{margin-bottom:.25rem;}
+
+  /* ---- Diagrams ---- */
+  .diagram{margin:.7rem 0 1rem; padding:.8rem .7rem .6rem; background:var(--navy-800); border:1px solid var(--navy-600); border-radius:8px;}
+  .diagram-cap{font-size:.66rem; text-transform:uppercase; letter-spacing:.4px; color:var(--ink-600); margin:0 0 .55rem;}
+
+  .dg-row{display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; row-gap:.6rem;}
+  .dg-step{display:flex; align-items:center; gap:.35rem; flex:0 0 auto;}
+  .dg-box{
+    background:var(--navy-700-solid); border:1px solid var(--navy-500); border-radius:6px;
+    padding:.4rem .55rem; font-size:.72rem; color:var(--ink-100);
+    display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.25;
+  }
+  .dg-row .dg-box{flex:0 0 auto;}
+  .dg-arrow{flex:0 0 auto; align-self:center; color:var(--yellow); font-size:.85rem; opacity:.85;}
+  .dg-cycle-wrap{position:relative;}
+  .dg-cycle-svg{display:block; width:100%; height:26px; margin-top:.15rem;}
+
+  .dg-grid{display:flex; flex-wrap:wrap; gap:.4rem;}
+  .dg-grid .dg-box{flex:1 1 120px; min-width:100px;}
+
+  .dg-stack{display:flex; flex-direction:column; gap:0;}
+  .dg-stack .dg-box{width:100%; border-radius:0; text-align:left; justify-content:flex-start; padding:.5rem .7rem;}
+  .dg-stack .dg-box:first-child{border-radius:6px 6px 0 0;}
+  .dg-stack .dg-box:last-child{border-radius:0 0 6px 6px;}
+  .dg-stack .dg-sep{text-align:center; color:var(--yellow); font-size:.7rem; opacity:.8; line-height:1;}
+
+  .dg-ladder{display:flex; flex-direction:column; gap:.5rem;}
+  .dg-ladder .dg-rung{display:flex; align-items:center; gap:.5rem;}
+  .dg-ladder .dg-box{text-align:left; justify-content:flex-start; flex:0 1 auto;}
+  .dg-ladder .dg-num{
+    flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:var(--yellow); color:var(--navy-950);
+    font-size:.68rem; font-weight:800; display:flex; align-items:center; justify-content:center;
+  }
+
+  .dg-quadrant{display:grid; grid-template-columns:auto 1fr 1fr; grid-template-rows:auto 1fr 1fr; gap:.3rem; font-size:.68rem;}
+  .dg-quadrant .dg-axis-y{grid-row:2/4; writing-mode:vertical-rl; transform:rotate(180deg); color:var(--ink-500); text-align:center; letter-spacing:.3px; padding:.2rem 0;}
+  .dg-quadrant .dg-axis-x{grid-column:2/4; text-align:center; color:var(--ink-500); letter-spacing:.3px;}
+  .dg-quadrant .dg-cell{
+    background:var(--navy-700-solid); border:1px solid var(--navy-500); border-radius:6px; padding:.5rem; color:var(--ink-100);
+    display:flex; flex-direction:column; gap:.2rem; min-height:64px;
+  }
+  .dg-quadrant .dg-cell b{font-size:.72rem; color:var(--yellow);}
+  .dg-quadrant .dg-cell span{font-size:.66rem; color:var(--ink-300); line-height:1.3;}
+
+  .dg-pyramid{display:flex; flex-direction:column; align-items:center; gap:.3rem;}
+  .dg-pyramid .dg-level{
+    background:var(--navy-700-solid); border:1px solid var(--navy-500); border-radius:5px;
+    padding:.4rem .6rem; font-size:.7rem; color:var(--ink-100); text-align:center;
+  }
+  .dg-pyramid .dg-level.l0{border-color:var(--yellow); color:var(--yellow); font-weight:700;}
+
+  .dg-nested{position:relative;}
+  .dg-nested .dg-n{border:1px solid var(--navy-500); border-radius:6px; padding:.6rem; background:var(--navy-700-solid);}
+  .dg-nested .dg-n + .dg-n{margin-top:.4rem;}
+  .dg-nested .dg-n-label{font-size:.62rem; text-transform:uppercase; letter-spacing:.4px; color:var(--yellow); margin-bottom:.3rem; display:block;}
+  .dg-nested .dg-n-desc{font-size:.68rem; color:var(--ink-300);}
+
+  .dg-compare{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:.5rem;}
+  .dg-compare .dg-col{background:var(--navy-700-solid); border:1px solid var(--navy-500); border-radius:6px; padding:.5rem;}
+  .dg-compare .dg-col h5{margin:0 0 .35rem; font-size:.72rem; color:var(--yellow);}
+  .dg-compare .dg-col ul{margin:0; padding-left:.9rem; font-size:.66rem; color:var(--ink-300); line-height:1.4;}
+
+  .sources{margin-top:.5rem;}
+  .sources h4{font-size:.68rem; text-transform:uppercase; letter-spacing:.4px; color:var(--ink-600); margin:.6rem 0 .3rem;}
+  .sources ul{list-style:none; margin:0; padding:0; font-size:.76rem;}
+  .sources li{padding:.4rem 0; border-top:1px solid var(--navy-800); word-break:break-word;}
+  .sources a{
+    color:var(--ink-100); text-decoration:none; display:inline-flex; align-items:baseline; gap:.4rem;
+    border-bottom:1px dotted var(--ink-600);
+  }
+  .sources a:before{content:"\2B07\FE0E"; color:var(--yellow); font-size:.8em; opacity:.9;}
+  .sources a:hover{color:var(--yellow); border-bottom-color:var(--yellow-dim);}
+  .sources .src-note{display:block; font-size:.68rem; color:var(--ink-600); margin-top:.15rem; font-style:italic;}
+
+  footer{max-width:var(--maxw); margin:0 auto; padding:1rem clamp(.85rem,3vw,1.5rem) 2.5rem; font-size:.75rem; color:var(--ink-600); text-align:center;}
+
+  :focus-visible{outline:2px solid var(--yellow); outline-offset:2px;}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-modules">Skip to modules</a>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <span class="badge">EY</span>
+      <div>
+        <h1>FORGE FDE · Learning Journey Portal</h1>
+        <p>Navigate the 30-day AI Forward Deployed Engineer curriculum, module by module</p>
+      </div>
+    </div>
+    <div class="top-meta">10 modules · 39 topics & reference notes</div>
+  </div>
+</header>
+
+<nav class="spine" aria-label="Journey module spine">
+  <div class="spine-scroll" id="spine"></div>
+</nav>
+
+<div class="layout">
+  <main class="modules" id="main-modules"></main>
+  <aside class="detail" id="detail" aria-live="polite" aria-label="Topic detail">
+    <div class="detail-placeholder">Select a topic chip from any module to see its explanation, key points, and source deck here.</div>
+  </aside>
+</div>
+
+<footer>Topics are sourced from primary reference material where available (<strong>Deck-sourced</strong>), from linked reference notes (<strong>Reference note</strong>), or authored directly from domain knowledge (<strong>Reference content</strong>) — see the badge on each topic. See <code>portal-gap-report.md</code> for the full source mapping.</footer>
+
+<script>
+/* ============================================================
+   CONTENT MAP — hand-editable. Two structures:
+   MODULES: journey spine order + which day/topic keys belong to each
+   DATA: one entry per day/cross-cutting key, sourced from real decks
+   ============================================================ */
+
+const MODULES = [
+  { id:`DK-01`, name:`FDE Operating Model`, blurb:`Who an FDE is, mindset, ambiguity, toolchain`, days:[`day-1`,`day-2`,`day-3`,`x-01`,`x-03`] },
+  { id:`DK-02`, name:`AI Engineering Foundations`, blurb:`Typed contracts, LLM SDK patterns`, days:[`day-4`] },
+  { id:`DK-03`, name:`Cloud AI Platform`, blurb:`Foundry, OpenAI, Search, RAG`, days:[`day-5`,`day-6`,`day-8`,`day-16`] },
+  { id:`DK-04`, name:`Domain & Architecture`, blurb:`DDD, C4, ADRs, SCQA`, days:[`day-7`,`day-11`,`day-12`,`day-17`,`day-21`,`x-05`,`x-08`] },
+  { id:`DK-05`, name:`Agentic Systems`, blurb:`Orchestration, reliability, chaos`, days:[`day-9`,`day-13`,`day-14`] },
+  { id:`DK-06`, name:`Data & Knowledge`, blurb:`Semantic layers, knowledge graphs`, days:[`day-19`,`day-20`] },
+  { id:`DK-07`, name:`Delivery Ops / FinOps`, blurb:`Cost telemetry, evaluation, CI/CD`, days:[`day-10`,`day-15`,`day-29`,`day-30`,`x-02`] },
+  { id:`DK-08`, name:`Process & Lean Discovery`, blurb:`DMAIC, stakeholders, simulation`, days:[`day-18`,`day-23`,`day-24`,`x-06`] },
+  { id:`DK-09`, name:`Trust, Risk & Security`, blurb:`RAI, ISO/EU AI Act, DPDP, OWASP LLM`, days:[`day-22`,`day-25`,`x-04`] },
+  { id:`DK-10`, name:`Spec-Driven Delivery`, blurb:`Specs → build → gates → evaluation`, days:[`day-26`,`day-27`,`day-28`,`day-31`,`x-07`] },
+];
+
+const DATA = {
+"day-1": {
+  module:`DK-01`, kind:`topic`,
+  title:`GenAI Foundations & the FDE Engagement Model`,
+  topics:[`GenAI & Agent Fundamentals`,`FDE Engagement Principles`],
+  status:`deck`,
+  diagram:{type:`grid`, caption:`Augmented-LLM workflow patterns, before graduating to a full agent`, items:[`Prompt Chaining`,`Routing`,`Parallelization`,`Orchestrator-Workers`,`Evaluator-Optimizer`]},
+  sourceDecks:[{name:`FORGE-FDE EYGS Program Pre-Read Material.pdf`, href:`sources/day1/1782107215476-FORGE-FDE EYGS Program Pre-Read Material.pdf`},{name:`FORGE_FDE-Orientation_Deck.pdf`, href:`sources/day1/1782301085741-FORGE_FDE-Orientation_Deck.pdf`}],
+  explanation:`Generative AI systems are built from foundation and large language models combined into agentic patterns. The "augmented LLM" framing treats the model as a core reasoning unit wrapped with retrieval, tools, and memory, composed into workflow patterns — prompt chaining, routing, parallelization, orchestrator-workers, and evaluator-optimizer — before graduating to full autonomous agents only when the task genuinely needs open-ended tool use. Simplicity, transparency, and careful tool/agent-computer-interface (ACI) design are the guiding principles: an agent should do the smallest thing that solves the problem, with every step inspectable.
+
+An AI Forward Deployed Engineer (FDE) engagement runs on a build-first mindset: FDE-ready from the outset, with fast escalation whenever a blocker appears rather than silent stalling. Twenty core FDE mindset principles anchor the role — problem-first thinking, field immersion, comfort with ambiguity, evidence discipline, security-by-design, and founder-like accountability for outcomes, not just outputs. The engagement itself moves through a structured arc: establishing FDE identity and mindset, platform and AI engineering foundations, domain discovery and architecture, spec-driven delivery, and production readiness at scale.`,
+  keyPoints:[
+    `Generative AI systems combine foundation/LLM models with retrieval, tools, and memory into an "augmented LLM" — the base unit for agentic design`,
+    `Workflow patterns (prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer) are generally preferred over full autonomous agents unless the task genuinely requires open-ended tool use`,
+    `Simplicity, transparency, and careful agent-computer interface (ACI) design keep agentic systems inspectable and debuggable`,
+    `The FDE mindset centers on problem-first thinking, field immersion, comfort with ambiguity, evidence discipline, and founder-like accountability for outcomes`,
+    `An FDE engagement runs build-first: escalate blockers early rather than let momentum stall silently`,
+  ],
+},
+"day-2": {
+  module:`DK-01`, kind:`topic`,
+  title:`The AI FDE Role: Operating Loop, Tech Stack & Enterprise Case Studies`,
+  topics:[`AI FDE Role Definition`,`AI FDE Operating Loop`,`Enterprise AI Case Studies`],
+  status:`deck`,
+  diagram:{type:`cycle`, caption:`The six-step AI FDE Operating Loop`, steps:[`Discover`,`Decide`,`Build`,`Govern`,`Evaluate`,`Deploy`]},
+  sourceDecks:[{name:`Day 2 - AI FDE - Case Study 1 - Narrative.pdf`, href:`sources/day2/1782282047159-Day 2 -  AI FDE - Case Study 1 - Narrative.pdf`},{name:`FORGE_FDE-Day-2_Deck.pdf`, href:`sources/day2/1782301228752-FORGE_FDE-Day-2_Deck.pdf`},{name:`Day 2 - AI FDE - Case Study 1 - Template (2).xlsx`, href:`sources/day2/1782282047658-Day 2 -  AI FDE - Case Study 1 - Template (2).xlsx`, note:`not machine-readable — open in Excel`}],
+  explanation:`An AI Forward Deployed Engineer is a field-deployed builder who combines the responsibilities of a solution architect, AI engineer, product thinker, domain translator, workflow analyst, and governance operator into a single accountable role. The role runs on a six-step operating loop — Discover, Decide, Build, Govern, Evaluate, Deploy — that is deliberately workflow-first rather than model-first: the loop starts by understanding the real business process before any model or architecture decision is made. Underneath the loop sits a seventeen-layer generative AI technology stack running from business framing through model selection, retrieval, tool-calling, guardrails, governance, and handover, with each layer mapping to a distinct FDE skill.
+
+Readiness in the role is proven through field judgment rather than tool familiarity, measured across five signals: discovery depth, architecture judgment, governance discipline, evaluation thinking, and the ability to defend decisions to stakeholders. Real enterprise deployments illustrate the pattern at scale: Airbus Skywise's predictive-maintenance workflows, a hospital command center built with Palantir at Cleveland Clinic, maritime multi-agent systems at AD Ports, multi-agent banking workflows at Banco Bradesco, a production AI portfolio at Hughes/EchoStar, and an enterprise GPT factory at Moderna. Each case surfaces the same recurring pattern: a workflow problem, a decision owner, a characteristic failure mode, a governance control, an evaluation metric, and a decision rule that ties them together.`,
+  keyPoints:[
+    `AI FDE = the integrator role at the intersection of data scientist, software engineer, solution architect, business analyst, and prompt engineer`,
+    `AI FDE Operating Loop: Discover → Decide → Build → Govern → Evaluate → Deploy — workflow-first, not model-first`,
+    `A seventeen-layer generative AI tech stack (model, RAG, tool-calling, guardrails, governance, handover) maps each layer to a distinct FDE meta-skill`,
+    `Six enterprise case studies (aviation, healthcare, maritime, banking, telecom, life sciences) each teach: workflow problem → decision owner → failure mode → governance control → evaluation metric → decision rule`,
+    `Readiness is proven by field judgment — discovery depth, architecture choice, governance discipline, evaluation thinking, stakeholder defense — not tool familiarity`,
+  ],
+},
+"day-3": {
+  module:`DK-01`, kind:`topic`,
+  title:`FDE Role & Identity · Product Mindset · Handling Ambiguity`,
+  topics:[`FDE Role & Identity`,`Product Mindset`,`Handling Ambiguity`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`The delivery lifecycle — not deployed until someone else can own it`, steps:[`Discovery`,`Framing`,`Prototype`,`Harden`,`Handover`]},
+  sourceDecks:[{name:`FORGE FDE Day 3-FDE Role & Identity Product Mindset.pdf`, href:`sources/day3/1782307428644-FORGE FDE Day 3-FDE Role & Identity Product Mindset.pdf`},{name:`Forge FDE-EYGDS Day 3-10 Complex Scenarios.pdf`, href:`sources/day3/1782361827718-Forge FDE-EYGDS Day 3-10 Complex Scenarios.pdf`}],
+  explanation:`The FDE role emerged where a generic product meets non-generic customer reality — engineering pushed to the edge of the enterprise, where field intelligence has to be converted directly into software judgment. Its doctrine follows four moves: go where the problem lives, understand the real workflow, build the smallest useful system, and harden only what survives real use. AI widened the deployment gap rather than closing it — the bottleneck shifted from model access, which is now commoditized, to enterprise translation and institutional trust.
+
+Product mindset in this context means optimizing for outcomes over outputs: a changed operating behavior in the business, not another artefact on a shelf. A problem only qualifies as FDE-worthy when it has real pain intensity, a meaningful decision frequency, a clear owner, usable data, demonstrable economic value, a viable adoption path, and an acceptable risk boundary — tested against a three-part Product Test covering value, behavior change, and ownership. The delivery lifecycle runs Discovery → Framing → Prototype → Harden → Handover, and a solution is not considered deployed until someone else can own it without the original builder in the room. A set of deliberately ambiguous enterprise scenarios — a data-subject rights agent, a credit-memo copilot, a phishing-triage assistant, a manufacturing deviation investigator, and others — provides practice in diagnosing which engineering layer (harness, context, orchestration loop, or prompt) is the actual point of failure, since the visible symptom rarely matches the real cause.`,
+  keyPoints:[
+    `FDE identity sits at the intersection of generic product and non-generic customer reality — field intelligence converted into software judgment`,
+    `FDE doctrine: go where the problem lives, understand the real workflow, build the smallest useful system, harden what survives use`,
+    `AI widened the deployment gap — the bottleneck shifted from model access to enterprise translation and institutional trust`,
+    `Product mindset: outcomes over outputs, problem-fit before product-fit, and a three-part Product Test (value, behavior change, ownership)`,
+    `Delivery lifecycle: Discovery → Framing → Prototype → Harden → Handover; a solution isn't deployed until someone else can own it`,
+    `Diagnosing complex, ambiguous scenarios means identifying whether the true point of failure is the harness, the context, the orchestration loop, or the prompt itself`,
+  ],
+},
+"x-01": {
+  module:`DK-01`, kind:`reference`,
+  title:`Toolchain setup (Cursor, repo layout, local run)`,
+  topics:[`Toolchain Setup`],
+  status:`notes`,
+  sourceDecks:[{name:`x-01-toolchain-setup.md`, href:`delivery-kit/modules/DK-01-fde-operating-model/artifacts/topics/x-01-toolchain-setup.md`, note:`reference note — not tied to a single source deck`}],
+  explanation:`Toolchain readiness directly determines delivery velocity. Working effectively requires repo-layout literacy (knowing where things live beats hunting for files under pressure), editor and agent tooling such as Cursor configured to follow team norms and command allowlists, and a hard line between synthetic fixtures and real secrets — the latter must never be committed. A smoke-test command is the actual acceptance bar for "setup is done," following a clone → configure → run smoke test → confirm-readiness path. Broken tooling frequently masquerades as a skill gap and can stall an entire team's progress.`,
+  keyPoints:[
+    `Toolchain readiness directly determines delivery velocity; broken tooling often masquerades as a skill gap`,
+    `Repo layout literacy beats hunting for files under pressure`,
+    `Editor/agent tooling (e.g. Cursor) must follow team norms and command allowlists`,
+    `Synthetic fixtures vs. real secrets must always be clearly distinguishable — never commit secrets`,
+    `"Done" means a green smoke test or a dated blocker list, not "works on my machine"`,
+  ],
+},
+"x-03": {
+  module:`DK-01`, kind:`reference`,
+  title:`Evidence discipline (cite sources, mark assumptions)`,
+  topics:[`Evidence Discipline`],
+  status:`notes`,
+  sourceDecks:[{name:`x-03-evidence-discipline.md`, href:`delivery-kit/modules/DK-01-fde-operating-model/artifacts/topics/x-03-evidence-discipline.md`, note:`reference note — not tied to a single source deck`}],
+  explanation:`Evidence discipline is core to FDE identity: every claim in a durable artifact must either cite a source (a specific document or repo path), be explicitly labeled an Assumption, or be logged as an open question — never presented as silent fact. This routing applies uniformly, from early discovery notes through architecture decision records and specifications, and is treated as essential to earning trust with risk and compliance stakeholders in enterprise delivery.`,
+  keyPoints:[
+    `Every claim must be citable to a specific source or repo path, or explicitly tagged as an Assumption`,
+    `Open questions are first-class artifacts, not something to bury in confident prose`,
+    `No orphan or silently invented claims are allowed in durable artifacts`,
+    `Applies end-to-end: from early discovery notes through architecture decision records and specifications`,
+    `Ungrounded certainty destroys credibility with enterprise risk and compliance partners`,
+  ],
+},
+
+"day-4": {
+  module:`DK-02`, kind:`topic`,
+  title:`Python for AI Scaffolding · Typed Contracts · LLM SDK Integration`,
+  topics:[`Python for AI Scaffolding`,`Typed Contracts`,`LLM SDK Integration`],
+  status:`deck`,
+  diagram:{type:`stack`, caption:`Hexagonal architecture — business logic stays vendor-free`, layers:[`Business Logic (core)`,`Ports (interfaces)`,`Adapters (typed client per provider)`,`External LLM Providers`]},
+  sourceDecks:[{name:`FORGE FDE-Day 4-Python for AI Scaffolding.pdf`, href:`sources/day4/1782307242712-FORGE FDE-Day 4-Python for AI Scaffolding.pdf`},{name:`FORGE FDE-Day 4-26-Jun-2026-Python_for_AI_Scaffolding.pdf`, href:`sources/day4/1782708607043-FORGE FDE-Day 4- 26-Jun-2026 -Python_for_AI_Scaffolding.pdf`},{name:`FORGE FDE Day 4-python-AI-scaffolding-TraineeGuide 1.pdf`, href:`sources/day4/1782307311475-FORGE FDE Day 4-python-AI-scaffolding-TraineeGuide 1.pdf`}],
+  explanation:`Treating a large language model like a flaky third-party vendor is the core discipline behind reliable AI scaffolding: type hints and strict Pydantic v2 models normalize divergent provider JSON shapes into one clean contract, async patterns and modern packaging keep I/O-bound LLM calls fast and reproducible, and a typed client wraps every provider call with timeouts, exponential backoff with jitter, and typed transient-versus-permanent error handling. Function-calling arguments are treated as untrusted proposals from a probabilistic model — validated against tight Pydantic schemas before execution, with validation errors fed back so the model can self-correct, plus separate business-rule and authorization checks for any destructive tool.
+
+FastAPI turns the same type hints into request and response models and an auto-generated OpenAPI specification, where a 422 validation error is a sign strict validation is working, not a bug — and response models double as a whitelist that stops secrets such as prompts or cost data from leaking. Testing focuses on contract testing rather than exact-string assertions, since LLM output is inherently non-deterministic: asserting JSON shape and properties, mocking the model in unit tests, and gating merges in CI on those contracts. A hexagonal, ports-and-adapters architecture keeps business logic vendor-free, so swapping providers becomes a single-file adapter change rather than a rewrite.`,
+  keyPoints:[
+    `Treat every LLM call like a network call to an unreliable vendor: type it, validate it, retry it (exponential backoff + jitter), time it out`,
+    `Use strict Pydantic v2 models with before-validators to normalize divergent provider JSON shapes into one clean contract`,
+    `Wrap async LLM calls in a single typed client (one choke-point for retries, logging, provider swaps) instead of scattering raw SDK calls across files`,
+    `Validate function-calling arguments as untrusted proposals against a strict Pydantic schema before execution; add business-rule/authorization checks since schema-valid does not mean safe to run`,
+    `Expose the service via FastAPI with explicit request and response models, generating a live OpenAPI /docs spec, using response models to whitelist what data leaves the service`,
+    `Test the contract (JSON shape, schema, properties) rather than exact AI wording; mock the LLM in unit tests and run contract tests as a CI gate`,
+    `Apply hexagonal architecture (ports & adapters) so core business logic never imports a vendor SDK, making provider migration a one-file swap`,
+  ],
+},
+
+"day-5": {
+  module:`DK-03`, kind:`topic`,
+  title:`Azure AI Foundry · Azure OpenAI · Landing Zones · IAM`,
+  topics:[`Azure AI Foundry`,`Azure OpenAI`,`Landing Zones`,`IAM`],
+  status:`deck`,
+  diagram:{type:`stack`, caption:`Six connected areas, unified by identity`, layers:[`Landing Zone (network, residency)`,`Managed Identity & Least-Privilege RBAC`,`Governed Build Platform (hubs, projects, catalogue)`,`Managed Model Serving (PTU/PAYG)`,`Supporting Services (search, safety, doc intelligence)`]},
+  sourceDecks:[{name:`FORGE FDE-Day 5-Azure_for_Enterprise_AI_FORGE.pdf`, href:`sources/day5/1782669285085-FORGE FDE-Day 5-Azure_for_Enterprise_AI_FORGE.pdf`},{name:`FORGE FDE-Day 5-Azure_Trainee_Lab_Kit (2).docx`, href:`sources/day5/1782669394129-FORGE FDE-Day 5-Azure_Trainee_Lab_Kit (2).docx`, note:`not text-extractable — open in Word`}],
+  explanation:`A production-grade cloud AI platform is best understood through six connected areas, unified by identity as the thread running through all of them. The platform layer spans a governed build environment (organizing work into hubs and projects, drawing from a catalogue of roughly 1,900 models, with prompt-flow-style tooling giving way to newer agent frameworks, plus built-in evaluation), a managed model-serving layer (deployments authenticated via workload identity rather than static keys, with a provisioned-throughput-vs-pay-as-you-go decision grounded in 30-60 days of real telemetry, and resilience against rate-limiting through retry, quota, and spillover strategies), and supporting services for search, content safety, and document intelligence. Deployment scope — global, data-zone, or regional — trades available capacity for data-residency guarantees at the same per-token price.
+
+Landing zones are the pre-existing application environment that AI capability plugs into, not a bespoke "AI landing zone": hub-and-spoke network egress, identity-bound service design, and data residency are inherited from the platform baseline. Managed identity and least-privilege role-based access control replace API keys entirely as the non-negotiable security posture — never hold long-lived keys, strip credential-listing permissions, and enforce policy-level blocks on local authentication. Choosing a hyperscaler-managed AI service over a direct model-provider API is a question of compliance, data residency, and identity-bound governance, not model capability, since the underlying models are frequently the same.`,
+  keyPoints:[
+    `A cloud AI platform spans three layers: a governed build/orchestration platform, managed model serving, and supporting services (search, content safety, document intelligence)`,
+    `Deployment scope (global / data-zone / regional) trades available capacity for data-residency guarantees at the same per-token price`,
+    `Provisioned throughput vs. pay-as-you-go is a measured decision — grounded in 30-60 days of real P95 token throughput, not a guess`,
+    `Landing zones are identity-bound by design: hub-and-spoke egress, private endpoints, AI deployed into an existing application landing zone`,
+    `Managed identity plus least-privilege RBAC replaces API keys entirely — identity is the security perimeter`,
+    `Choosing a managed cloud AI service over a direct model-provider API is a compliance/residency/governance decision, not a capability decision — the underlying models are often identical`,
+  ],
+},
+"day-6": {
+  module:`DK-03`, kind:`topic`,
+  title:`Azure AI Search · Vector Stores · Hybrid Retrieval · RAG Foundations`,
+  topics:[`Azure AI Search`,`Vector Stores`,`Hybrid Retrieval`,`RAG Foundations`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`The retrieval-augmented generation pipeline`, steps:[`Corpus`,`Chunk & Index`,`Hybrid Retrieve (BM25+Vector)`,`Re-rank`,`Generate`,`Cite`]},
+  sourceDecks:[{name:`FORGE FDE-Day 6-RAG_Foundations_on_Azure.pdf`, href:`sources/day6/1782669491430-FORGE FDE-Day 6-RAG_Foundations_on_Azure.pdf`},{name:`FORGE FDE-Day 6-Vector_Quantization_Azure_AI_Search.pdf`, href:`sources/day6/1782831155125-FORGE FDE-Day 6-Vector_Quantization_Azure_AI_Search.pdf`},{name:`FORGE FDE-Day 6-Chunking Strategies-RAG.pdf`, href:`sources/day6/1783074602895-FORGE FDE-Day 6-Chunking Strategies-RAG.pdf`}],
+  explanation:`Production-grade retrieval-augmented generation rests on a managed search index combining text, vectors, and metadata with integrated vectorization at index time. Hybrid retrieval — fusing BM25 keyword search with dense vector search via Reciprocal Rank Fusion, followed by a cross-encoder semantic ranker — is consistently the strongest-performing retrieval mode, ahead of vector-only search. A capability ladder stacks improvements cheapest-first: hybrid retrieval, then a re-ranker, then query rewriting or hypothetical-document embeddings (HyDE), each adding cost and latency for a specific accuracy gain. Retrieval-augmented generation has a structural failure mode worth naming honestly: multi-hop and relational questions ("which suppliers changed terms after the merger") are not well served by chunk retrieval and require a knowledge-graph layer instead.
+
+Retrieval quality is chunking-dependent above almost everything else: roughly 512-token chunks with 10-25% overlap is a sensible starting default, tuned against a golden evaluation set using recall@k, mean reciprocal rank, and normalized discounted cumulative gain. Vector compression — scalar quantization (roughly 4x smaller, int8) or binary quantization (roughly 32x smaller, 1-bit) — can be configured declaratively in the index schema, paired with rescoring and oversampling to protect recall. Because recall@k gates everything downstream, a chunk that never enters the retrieved context cannot be answered from, however well-crafted the prompt around it.`,
+  keyPoints:[
+    `A search index combines key + searchable content (BM25) + vector field + filterable metadata, with integrated vectorization at index time`,
+    `Hybrid retrieval fuses BM25 and dense vector search via RRF, then a semantic (cross-encoder) ranker re-scores the top ~50 candidates`,
+    `A retrieval capability ladder adds capability cheapest-first: hybrid (free) → re-ranker (cheap latency) → query rewriting/HyDE (extra model call)`,
+    `Chunking is the highest-leverage knob; ~512 tokens with 10-25% overlap is a sensible default, tuned against a golden eval set`,
+    `Vector compression (scalar ~4x / binary ~32x) is configured declaratively in the index schema with rescoring+oversampling to preserve nDCG`,
+    `recall@k gates everything downstream — a chunk that never enters context cannot be answered from, however good the prompt`,
+  ],
+},
+"day-8": {
+  module:`DK-03`, kind:`topic`,
+  title:`Agentic Retrieval: Wiring Search into LangGraph Agents`,
+  topics:[`LangGraph Agents`,`Agentic Retrieval Patterns`,`Tool-Calling Reliability`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`Agent = deterministic edges + probabilistic core + audited tools`, steps:[`Input`,`Planner`,`Retrieval Tool Call`,`Executor`,`Grounded Answer`]},
+  sourceDecks:[{name:`FORGE FDE-Day 8-AI_Agents_on_Azure.pdf`, href:`sources/day8/1782923111445-FORGE FDE-Day 8-AI_Agents_on_Azure.pdf`}],
+  explanation:`Wiring a hybrid search index into an agent as an audited, typed tool turns retrieval from a one-shot lookup into part of a governed reasoning loop: the agent calls retrieval, receives grounded chunks back, and reasons over them within an inspectable graph rather than a black box. The core architectural framing is "agent = deterministic edges + probabilistic core + audited tools" — keep the unpredictable part (the model's reasoning) as small as possible, and make everything around it deterministic and logged. Graph-based agent frameworks model an agent as typed state moving through nodes connected by deterministic or conditional edges, with checkpointing that makes every run resumable and auditable after the fact.
+
+Separating planning from execution — a planner proposes a multi-step approach, an executor carries it out — keeps multi-step reasoning inspectable and gives a human the chance to edit the plan before anything executes. Tool calls themselves are validated against a schema, retried with backoff, given explicit timeouts, and can fan out and fan back in parallel — the same "treat it like a flaky vendor" discipline applied to model calls generally. Guardrails belong at the input, output, tool, and human-in-the-loop boundaries around that small probabilistic core, never embedded inside the prompt itself. This graph-based, audited approach is generally favored over lighter-weight agent frameworks for regulated or enterprise-critical work specifically because of its auditability, native human-in-the-loop support, and durable state persistence.`,
+  keyPoints:[
+    `Wiring hybrid retrieval into an agent as a typed, audited tool call turns search into part of a governed reasoning loop, not a one-shot lookup`,
+    `Graph-based agents model state as typed data moving through nodes and deterministic/conditional edges, with checkpointing for resumable, auditable runs`,
+    `Planner/executor separation keeps multi-step reasoning inspectable and lets a human edit the plan before execution`,
+    `Tool calls are schema-validated, retried with backoff, timed out, and can fan-out/fan-in in parallel — treat every model call like a call to an unreliable vendor`,
+    `Guardrails belong at input/output/tool/human-in-the-loop boundaries around a deliberately small probabilistic core, never inside the prompt`,
+    `Graph-based, checkpointed agent architectures are favored for regulated work over lighter frameworks specifically for auditability and durable state`,
+  ],
+},
+"day-16": {
+  module:`DK-03`, kind:`topic`,
+  title:`Cloud Platform Consolidation, LLMOps Integration & Architecture Decision Records`,
+  topics:[`Platform Consolidation`,`LLMOps Integration`,`Architecture Decision Records`],
+  status:`deck`,
+  diagram:{type:`grid`, caption:`Retrieval architectures compared in the ADR`, items:[`Vector-only`,`Hybrid + RRF + Semantic Rank`,`Vectorless / Index-based`,`Knowledge Graph`]},
+  sourceDecks:[{name:`FORGE FDE-Day-16-Azure_Consolidation_ADR2.pdf`, href:`sources/day16/1783999135867-FORGE FDE-Day-16-Azure_Consolidation_ADR2.pdf`}],
+  explanation:`Bringing a platform stack — model serving, an agent running on a container platform, hybrid search retrieval, a CI/CD pipeline, an evaluation gate on a golden set, and telemetry — together into one live, smoke-tested system, rather than several disconnected demos, is the point at which a cloud AI deployment becomes genuinely production-representative, cross-cut throughout by managed identity and durable state. A real cost review at this stage reads budget against actual spend per service, applies rightsizing levers, and re-decides provisioned-throughput versus pay-as-you-go using real, measured token telemetry rather than the original estimate — often landing on "stay pay-as-you-go" once actual utilization is below the roughly 50% break-even point.
+
+An architecture decision record (ADR) formalizes the retrieval-architecture choice at this stage: comparing vector-only retrieval, hybrid retrieval with reciprocal-rank fusion and semantic re-ranking, vectorless/index-based approaches, and knowledge graphs on accuracy versus cost, then signing off on the accepted approach — typically hybrid retrieval with semantic re-ranking — while explicitly deferring knowledge-graph investment until a genuine multi-hop or relational need appears. A short gate checklist (load test, evaluation gate, live telemetry, a rehearsed rollback, documented release, and a signed ADR) is a reasonable bar before treating a retrieval architecture as locked and building further capability on top of it, rather than replacing it.`,
+  keyPoints:[
+    `Bringing model serving, an agent, hybrid retrieval, CI/CD, an eval gate, and telemetry together into one smoke-tested system is what makes a deployment production-representative`,
+    `A cost review reads budget-vs-actual by service and re-decides provisioned-throughput vs. pay-as-you-go using real measured token telemetry`,
+    `An ADR formally compares vector-only retrieval, hybrid+RRF+semantic ranking, vectorless/index-based approaches, and knowledge graphs on accuracy vs. cost`,
+    `A typical ADR outcome: hybrid retrieval (BM25+vector) with RRF fusion and semantic re-ranking, accepted as the retrieval baseline`,
+    `A gate checklist — load test, eval gate, telemetry, rehearsed rollback, release docs, signed ADR — is a reasonable bar before calling a retrieval architecture locked`,
+    `Further capability (e.g. knowledge graphs) should build on top of a locked retrieval baseline, not replace it prematurely`,
+  ],
+},
+
+"day-7": {
+  module:`DK-04`, kind:`topic`,
+  title:`Domain-Driven Design · Bounded Contexts · Ubiquitous Language`,
+  topics:[`Domain-Driven Design`,`Bounded Contexts`,`Ubiquitous Language`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`The domain-modeling workflow, before any implementation`, steps:[`Problem Framing`,`Domain Discovery`,`Ubiquitous Language`,`Bounded Contexts`,`Context Mapping`,`Tactical Modeling`]},
+  sourceDecks:[{name:`FORGE FDE Day 7-Domain-Driven Design-01-Jul-26.pdf`, href:`sources/day7/1782831965477-FORGE FDE Day 7-Domain-Driven Design- 01-Jul-26.pdf`}],
+  explanation:`Domain-Driven Design is the discipline that turns enterprise ambiguity into bounded, governed, explainable systems — including generative AI workflows. Popularized by Eric Evans in 2003, it exists because large, semantically messy organizations outgrow any single universal data model: different parts of a business genuinely mean different things by the same word, and pretending otherwise creates silent, expensive mistakes. A domain-modeling workflow moves from problem framing through domain and subdomain discovery, establishing ubiquitous language, identifying bounded contexts, mapping the relationships between those contexts, event storming, and tactical modeling — before ever touching retrieval, agent design, or implementation.
+
+Weaker alternatives to real domain modeling exist and are worth naming: a purely technology-first approach, a single enterprise-wide glossary treated as sufficient, data-first retrieval without a domain model behind it, process mapping without a model of meaning, and treating the prompt itself as the architecture. Each is a useful fragment but a weak foundation on its own. Tactical building blocks — entities, value objects, aggregates, domain events, commands, policies, and domain services — are what ultimately tell a system what exists, what changed, what is allowed, and what must be recorded for audit. Domain-modeling outputs map directly onto delivery: a domain glossary becomes prompt vocabulary, a bounded-context map becomes retrieval and agent scope, a rules catalogue becomes guardrails, and an evidence trail becomes audit proof. The approach fails most often when teams copy the diagrams without doing the real discovery work, skip domain experts, or measure success by diagram completeness instead of delivery outcomes.`,
+  keyPoints:[
+    `DDD was popularized by Eric Evans (2003); a Bounded Context is a model/language boundary, not automatically one microservice`,
+    `Domain-modeling workflow: problem framing → domain/subdomain → ubiquitous language → bounded contexts → context map → event storming → tactical model → retrieval/agent design → human review → evidence → evaluation → pilot → handover`,
+    `Non-DDD approaches (technology-first, universal glossary, data-first retrieval, process-only, prompt-as-architecture) are useful fragments but weak foundations for Gen AI systems`,
+    `Tactical DDD artefacts (entity, value object, aggregate, domain event, command, policy/rule, domain service) tell a system what exists, what changed, what is allowed/prohibited, and what needs escalation`,
+    `DDD outputs map directly to delivery: domain glossary → prompt vocabulary, bounded context map → retrieval/agent scope, rules catalogue → guardrails, evidence trail → audit proof`,
+    `DDD fails when teams copy patterns without real domain discovery, skip domain experts, or measure diagrams instead of delivery outcomes`,
+  ],
+},
+"day-11": {
+  module:`DK-04`, kind:`topic`,
+  title:`DDD Context Mapping & Ubiquitous Language in Practice`,
+  topics:[`Context Mapping`,`Ubiquitous Language Practice`],
+  status:`deck`,
+  diagram:{type:`stack`, caption:`The nine-layer reference pattern, repeated per industry`, layers:[`User / Workforce`,`Enterprise AI Access & Routing`,`Agentic Systems (by agent type)`,`Orchestration & Policy Hub`,`Enterprise Data Platform`,`Validation & Evidence Gate`,`Output / Action / Release`]},
+  sourceDecks:[{name:`FORGE FDE-Day-11-PDF Deck.pdf`, href:`sources/day11/1783427792015-FORGE FDE-Day-11-PDF Deck.pdf`}],
+  explanation:`Bounded-context and ubiquitous-language thinking looks different depending on the industry it's applied to. Across banking, life sciences, industrial control/OT, healthcare, non-bank financial services, and consumer goods, the same nine-layer reference pattern recurs — a user/workforce layer, enterprise AI access and model routing, agentic systems organized by real-world agent type, an orchestration and policy decision hub, business and engineering integration lanes, an enterprise systems and data platform layer, a validation and evidence gate, an output/action/release layer, and an observability/feedback layer — paired throughout with a parallel governance and control-plane rail covering identity, use-case classification, agent approval, data access control, output validation, and audit trails.
+
+What changes between industries is the vocabulary inside that shape: healthcare names clinical, operations, and revenue-cycle agents where a non-bank financial institution names portfolio, trading, and compliance agents — the platform shape repeats, but bounded contexts and agreed vocabulary must be mapped per industry, never assumed generic. The underlying insight generalizes: generative AI fails in enterprises far more often because the organization's meaning underneath it is weak than because the model itself is weak. Domain-driven design makes that meaning explicit, bounded, testable, and governable before any model gets involved.`,
+  keyPoints:[
+    `Six industry-specific Gen AI reference stacks (banking, life sciences, industrial control/OT, healthcare, non-bank financial services, consumer goods) each show the same 9-layer architecture with a parallel governance rail`,
+    `Each vertical names its own agent types (e.g. clinical/operations/revenue-cycle agents in healthcare, portfolio/trading/compliance agents in financial services), showing bounded contexts differ by domain`,
+    `Cross-cutting governance columns (identity, use-case classification, agent approval, data access control, output validation, audit trails) recur in every vertical`,
+    `Context boundaries and agreed vocabulary must be mapped per industry, never assumed generic`,
+    `Core insight: Gen AI fails in enterprises not because the model is weak but because the enterprise meaning underneath it is weak — DDD makes that meaning explicit, bounded, testable, governable`,
+  ],
+},
+"day-12": {
+  module:`DK-04`, kind:`topic`,
+  title:`C4 Modelling, ADRs & Gen AI Architecture Patterns`,
+  topics:[`C4 Modelling`,`Architecture Decision Records`,`Gen AI Architecture Patterns`,`Trade-off Matrices`],
+  status:`expert`,
+  diagram:{type:`nested`, caption:`The four nested C4 levels`, levels:[
+    {label:`System Context`, desc:`The system as one box among the people/systems it interacts with`},
+    {label:`Container`, desc:`Deployable units (apps, services, databases, queues) and how they talk`},
+    {label:`Component`, desc:`Internal building blocks of one container`},
+    {label:`Code`, desc:`Classes and interfaces — usually generated, not hand-drawn`},
+  ]},
+  sourceDecks:[],
+  explanation:`The C4 model gives software architecture four nested levels of abstraction, each answering a different question for a different audience. A System Context diagram shows the system as a single box surrounded by the people and other systems it interacts with — the right level for a non-technical stakeholder conversation. A Container diagram opens that box to show the deployable units (applications, services, databases, message queues) and how they communicate — the level most useful for a technical design review. A Component diagram opens a single container to show its internal building blocks and their responsibilities, and a Code diagram (rarely drawn by hand today, more often generated) shows classes and interfaces. For generative AI systems, the container and component levels typically need explicit new element types: model-serving endpoints, retrieval/vector-store components, tool-calling gateways, evaluation and guardrail services, and human-approval checkpoints — none of which fit naturally into a pre-AI C4 vocabulary.
+
+An Architecture Decision Record (ADR) captures a single significant decision in a fixed, lightweight structure: the context and forces at play, the options considered, the decision made, the consequences (including negative ones), and — critically — a review date and rollback plan. The MADR (Markdown ADRs) format and the Y-statement ("in the context of X, facing the concern Y, we decided Z to achieve Q, accepting downside R") are two common templates; either works as long as alternatives-considered and consequences are never omitted. A trade-off matrix makes the reasoning behind an ADR auditable at a glance: candidate options as rows, evaluation criteria (cost, latency, accuracy, operational complexity, vendor lock-in, compliance fit) as columns, with a score or qualitative rating in each cell and the chosen option's row highlighted.
+
+Common generative AI architecture patterns worth having as a working vocabulary include retrieval-augmented generation (ground responses in retrieved evidence before generating), the orchestrator-workers pattern (a coordinating agent delegates subtasks to specialized workers), the evaluator-optimizer loop (one model generates, a second critiques and requests revision), and human-in-the-loop gating (a system recommends, a human decides, the system executes only if authorized). Choosing between these patterns — and documenting that choice as an ADR backed by a trade-off matrix — is what turns an architecture diagram from an illustration into a defensible engineering decision.`,
+  keyPoints:[
+    `C4 has four nested levels — System Context, Container, Component, Code — each answering a different question for a different audience`,
+    `Generative AI systems typically need new C4 element types at the container/component level: model-serving endpoints, retrieval/vector-store components, tool-calling gateways, evaluation/guardrail services, human-approval checkpoints`,
+    `An ADR captures context, options considered, the decision, consequences (including negative ones), and a review date/rollback plan — MADR and the Y-statement are two common templates`,
+    `A trade-off matrix (options × criteria, scored, chosen option highlighted) is what makes an ADR's reasoning auditable at a glance`,
+    `Core Gen AI architecture patterns: retrieval-augmented generation, orchestrator-workers, evaluator-optimizer, and human-in-the-loop gating`,
+    `A design only becomes a defensible engineering decision once it's backed by a written ADR and a trade-off matrix — a diagram alone is not a decision`,
+  ],
+},
+"day-17": {
+  module:`DK-04`, kind:`topic`,
+  title:`SCQA Storytelling & Cross-Framework Integration`,
+  topics:[`SCQA Storytelling`,`Discovery-to-Architecture Traceability`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`SCQA sits at the front of the architecture-and-decision chain`, steps:[`SCQA (why it matters)`,`DDD (what's modeled)`,`C4 (how it's structured)`,`ADR (why this design)`]},
+  sourceDecks:[{name:`SQCA-Deck.pdf`, href:`sources/day17/1784094387458-SQCA-Deck.pdf`},{name:`SCQA-DDD-C4-ADR-Deck.pdf`, href:`sources/day17/1784094390400-SCQA-DDD-C4-ADR-Deck.pdf`}],
+  explanation:`SCQA — Situation, Complication, Question, Answer — is a decision-framing model that converts business context, workflow signals, stakeholder needs, and evidence into a clear narrative: what is true today (Situation), what has changed or gone wrong (Complication), what decision is actually being asked (Question), and what the recommended path is (Answer). Its core value is turning ambiguity into a bounded, evidence-backed narrative that can be validated against a pilot scope, an evidence contract, adoption metrics, and trust/risk checks before being treated as settled.
+
+SCQA sits at the front of a chain that runs through the rest of the architecture and delivery disciplines: SCQA establishes why a problem matters and produces a decision narrative, Domain-Driven Design establishes what business is actually being modeled and produces a domain model with context boundaries, C4 shows how the resulting solution is structured and produces architecture views, and an Architecture Decision Record captures why a particular design was chosen. Wiring these four together into one traceable chain — rather than treating them as separate, disconnected exercises — is what lets a decision be defended end-to-end: from the original business complication through to the specific architectural trade-off that resolved it.`,
+  keyPoints:[
+    `SCQA mental model: Situation → Complication → Question → Answer, fed by business context, workflow signals, stakeholder needs, and evidence`,
+    `SCQA's core principle: it turns ambiguity into a clear, bounded, evidence-backed narrative`,
+    `SCQA-DDD-C4-ADR chain: SCQA (why this problem matters) → DDD (what business is being modelled) → C4 (how the solution is structured) → ADR (why this design was chosen)`,
+    `Integration workflow: Discover → Frame → Design → Decide → Deliver & Evaluate`,
+    `A decision is only defensible end-to-end once it's traceable from the original business complication through to the specific architectural trade-off that resolved it`,
+  ],
+},
+"day-21": {
+  module:`DK-04`, kind:`topic`,
+  title:`Architecture Discovery · Reference Architectures · Solution Decoding`,
+  topics:[`Architecture Discovery`,`Reference Architectures`,`Solution Decoding`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`Four sequential moves — from a one-sentence brief to a defendable scope`, steps:[`Discover`,`Anchor`,`Decode`,`Commit`]},
+  sourceDecks:[{name:`FORGE_Architecture_Discovery_Solution_Decoding.pdf`, href:`sources/day21/1784604319148-FORGE_Architecture_Discovery_Solution_Decoding.pdf`}],
+  explanation:`Turning a one-sentence, disputed client brief into a defendable scope follows four sequential moves: discover, anchor, decode, commit. Architecture discovery starts from running evidence rather than documentation — CI/CD pipelines, cloud billing, on-call rotas — mapping integration points by contract, direction, volume, failure behavior, ownership, and auditability, and auditing technical debt as blocking, taxing, latent, or irrelevant. Four debt categories specifically break AI projects and deserve their own line item: no ground truth, no test environment, no observability, and no clear decision owner.
+
+Anchoring means reading from established reference sources in a deliberate order to avoid cargo-culting or checklist theater: agent design patterns from a major model provider first (as a complexity brake — default to the simplest pattern that works), then a vendor's baseline reference architecture (client, intelligence, inferencing, knowledge, and data-pipeline layers plus enterprise landing-zone additions), then a cloud provider's well-architected framework for AI as a structured review-gate question bank. Every departure from a chosen baseline should become one sentence in an ADR. Decoding a loose brief into bounded scope uses a seven-question stakeholder-probing framework ("what may this system never do?", "what would make you cancel this in month three?"), a Solution Canvas (seven boxes: problem, stakeholders, constraints, success metrics, architecture, risks, ROI, with unknowns left visible as named, dated spikes rather than hidden), and T-shirt sizing narrowed by an uncertainty cone that tightens from initial brief through discovery, spikes, and signed design. Spikes are deliberately bought, not built — narrow, time-boxed investigations that collapse uncertainty on feasibility, access, integration, or compliance before committing to a full build.`,
+  keyPoints:[
+    `Four-move discipline: Discover (inventory, integration points, tech-debt audit) → Anchor (reference baseline) → Decode (loose brief → bounded scope) → Commit (canvas, estimate, spikes)`,
+    `Technical debt triaged as Blocking / Taxing / Latent / Irrelevant, plus four AI-specific debts: no ground truth, no environment, no observability, no decision owner`,
+    `Three reference sources in fixed reading order — agent design patterns, a baseline reference architecture, a well-architected framework for AI — every departure from a baseline becomes an ADR sentence`,
+    `A Solution Canvas has seven boxes (problem, stakeholders, constraints, success metrics, architecture, risks, ROI) with blanks left visible as named, dated spikes`,
+    `Estimating uses T-shirt sizes plus an uncertainty cone that narrows from brief → discovery → spikes done → design signed`,
+    `A seven-question stakeholder-probing framework surfaces an explicit NOT-in-scope list rather than leaving scope implicit`,
+  ],
+},
+"x-05": {
+  module:`DK-04`, kind:`reference`,
+  title:`Shared glossary & ubiquitous language hygiene`,
+  topics:[`Glossary & UL Hygiene`],
+  status:`notes`,
+  sourceDecks:[{name:`x-05-glossary-ul-hygiene.md`, href:`delivery-kit/modules/DK-04-domain-and-architecture/artifacts/topics/x-05-glossary-ul-hygiene.md`, note:`reference note — not tied to a single source deck`}],
+  explanation:`A living, context-aware glossary must be kept so terms stay consistent across specs, ADRs, and prompts, preventing silent meaning drift. Per-context terms with explicit translations are preferable to a single enterprise-wide glossary fiction, and glossary updates should be part of the definition of done for any discovery activity.`,
+  keyPoints:[
+    `Ubiquitous language hygiene prevents silent meaning drift across specs, ADRs, and prompts`,
+    `Prefer per-context terms with explicit translations over one enterprise mega-glossary`,
+    `Glossary updates are part of the definition of done for discovery work`,
+    `Term lifecycle: propose term → context owner → accept definition → use in specs/ADRs`,
+    `Untracked term drift creates false agreement and broken interfaces between teams`,
+  ],
+},
+"x-08": {
+  module:`DK-04`, kind:`reference`,
+  title:`Traceability: Discovery → SCQA → DDD → C4 → ADR → SDD/PRD`,
+  topics:[`Traceability Spine`],
+  status:`notes`,
+  diagram:{type:`pipeline`, caption:`Every later-stage claim cites backward to an earlier stage`, steps:[`Discovery`,`SCQA`,`DDD`,`C4`,`ADR`,`SDD/PRD`]},
+  sourceDecks:[{name:`x-08-traceability-spine.md`, href:`delivery-kit/modules/DK-04-domain-and-architecture/artifacts/topics/x-08-traceability-spine.md`, note:`reference note — not tied to a single source deck`}],
+  explanation:`An end-to-end traceability spine — Discovery → SCQA → DDD → C4 → ADR → SDD/PRD, continuing into specs and tests — requires every important claim in a later artefact to cite backward to an earlier stage or be explicitly labelled an Assumption. Traceability outranks cleverness in enterprise delivery: breaks in the citation chain are risks that must be backfilled or flagged, not ignored.`,
+  keyPoints:[
+    `Traceability spine order: Discovery → SCQA → DDD → C4 → ADR → SDD/PRD, continuing into specs and tests`,
+    `Every later-stage claim must cite backward to an earlier artefact or be marked an explicit Assumption`,
+    `Breaks in the citation chain are treated as risks that must be backfilled or clearly labelled`,
+    `Untraceable designs cannot be reviewed, tested, or defended in enterprise delivery`,
+    `A worked reference example illustrates the spine end to end when properly labelled`,
+  ],
+},
+
+"day-9": {
+  module:`DK-05`, kind:`topic`,
+  title:`Multi-Agent Orchestration: Topologies, Framework Selection & Resilience Testing`,
+  topics:[`Multi-Agent Topologies`,`Agent Framework Selection`,`Resilience & Chaos Testing`],
+  status:`deck`,
+  diagram:{type:`grid`, caption:`Three core multi-agent topologies`, items:[`Orchestrator / Sub-agent`,`Parallel Fan-out / Fan-in`,`Handoffs (chained)`]},
+  sourceDecks:[{name:`FORGE FDE-Day 9_Multi_Agent_Orchestration.pdf`, href:`sources/day9/1782995563502-FORGE FDE-Day 9_Multi_Agent_Orchestration.pdf`}],
+  explanation:`Three topologies cover most real multi-agent systems: an orchestrator delegating to sub-agents, parallel agents fanning out and back in, and handoffs between agents that pass a task along a chain. State needs to move between agents through typed contracts, never loosely-structured free text, so that one agent's output is reliably consumable by the next. Framework choice among role-based frameworks, successor frameworks to earlier multi-agent toolkits, and graph-based frameworks offering maximum control comes down to team familiarity, required control granularity, and platform footprint — mapped concretely onto cloud messaging primitives (queues for point-to-point dispatch, topics for broadcast, sessions and peek-lock semantics for ordered/exactly-once-ish processing, and dead-letter queues for poison messages) needed for real scale-out and reliability.
+
+Six systemic failure modes recur across multi-agent systems and each has a specific architectural countermeasure: cascading failure (one agent's error propagating through the chain), agent drift (gradual deviation from intended behavior), orchestrator overload, duplicate work, poison or lost messages, and groupthink (agents reinforcing each other's errors instead of catching them). A structured resilience test — establish a steady state, inject a specific fault, observe the system's behavior, measure the outcome against a defined pass criterion — proves a multi-agent system degrades gracefully under real failure conditions instead of merely hoping it will.`,
+  keyPoints:[
+    `Three topologies — orchestrator/sub-agent, parallel agents, handoffs — combine into most real production systems`,
+    `Framework choice depends on team familiarity, control granularity needed, and platform footprint: role-based, graph-based, or SDK-style frameworks each suit different needs`,
+    `Service Bus queues/topics/sessions · competing consumers · dead-letter queues turn "agents chatting" into a reliable distributed system`,
+    `Six named failure modes (cascade, drift, overload, duplication, poison messages, groupthink) each have a specific architectural defense`,
+    `A resilience test — kill an agent, poison a message, crash the orchestrator — proves the system degrades gracefully instead of just hoping it will`,
+  ],
+},
+"day-13": {
+  module:`DK-05`, kind:`topic`,
+  title:`Agent Reliability Engineering: Failure Modes & Persistence Architecture`,
+  topics:[`Agent Reliability Engineering`,`Failure Mode Analysis`,`Agent State Persistence`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`A corrected production pipeline, compressed to its key stages`, steps:[`Identity Resolution`,`Risk Tiering`,`Gateway`,`Grounding`,`Output Validation`,`Audit Log`]},
+  sourceDecks:[{name:`FORGE FDE EYGDS-Day13-Aarohan Bank GenAI Platform Workshop.pdf`, href:`sources/day13/1783568847799-FORGE FDE EYGDS-Day13-Aarohan Bank GenAI Platform Workshop.pdf`}],
+  explanation:`A governed internal generative AI platform is best understood by contrasting a naive design against a hardened one. A naive employee-facing chatbot wired directly to a language model has at least eight recurring failure modes: hallucination, stale information, missing citations, ignored entitlements, unintended data exposure, no audit trail, unauthorized action-taking, and no operational process for any of it. A corrected production pipeline closes each of these across roughly a dozen stages — identity resolution, risk tiering, a gateway layer, request routing, grounding via retrieval/tools/rules, model routing, output validation, human approval where warranted, and audit logging.
+
+Reliability and persistence become concrete at the agent-runtime layer: bounded-investigation controls (step limits, cost limits, a verifier component, and a mandatory human-escalation trigger for low-confidence outcomes), read-only-by-default execution with an explicit approved-tool allowlist, and a sandboxed execution environment that isolates any generated code with timeouts, package allowlists, network restrictions, and secret scanning before anything touches production. On the persistence side, the model-serving layer's internals — key-value caching, paged key-value allocation, prefix caching, and continuous batching — determine both latency and cost at scale, while per-request cost and latency tracing makes those internals observable rather than opaque. A structured decision register — each entry with alternatives considered, risks, controls, a rollback plan, and a review date — turns every reliability and failure-handling choice into governed, auditable engineering reasoning rather than tribal knowledge.`,
+  keyPoints:[
+    `A naive chatbot-to-LLM design has eight recurring failure modes; a corrected multi-stage production pipeline closes each one`,
+    `Agent runtime controls enforce reliability bounds directly: read-only by default, approved tools only, step/cost/time limits, a verifier, mandatory human escalation for uncertain results`,
+    `A sandboxed execution environment isolates generated code with timeouts, package allowlists, network guards, and secret scanning`,
+    `Model-serving persistence internals — key-value cache, paged KV allocation, prefix caching, continuous batching, per-request cost/latency tracing — determine latency and cost at scale`,
+    `A structured decision register — each entry with alternatives considered, risks, controls, rollback plan, and review date — turns reliability decisions into governed, auditable engineering reasoning`,
+  ],
+},
+"day-14": {
+  module:`DK-05`, kind:`topic`,
+  title:`Multi-Agent Orchestration: Production Case Studies & Governance`,
+  topics:[`Production Multi-Agent Case Studies`,`Orchestration Governance`],
+  status:`deck`,
+  diagram:{type:`grid`, caption:`A sample of production orchestration patterns`, items:[`Lead + Parallel Subagents`,`Draft-PR Gated Autonomy`,`Supervisor / Manager`,`Planner-Executor-Critic`,`Debate / Review Committee`]},
+  sourceDecks:[{name:`FORGE FDE EYGDS - Multi-Agent Orchestration -Deck.pdf`, href:`sources/day14/1783655008947-FORGE FDE EYGDS - Multi-Agent Orchestration -Deck.pdf`},{name:`FORGE FDE EYGDS - BOARDROOM BRIEFING Deck.pdf`, href:`sources/day14/1783658933069-FORGE FDE EYGDS - BOARDROOM BRIEFING Deck.pdf`}],
+  explanation:`Ten named multi-agent design patterns each map onto a real, publicly known production deployment, which is a far more useful way to evaluate a pattern than reasoning about it in the abstract: a lead-agent-plus-parallel-subagents pattern used in production research assistants, a draft-pull-request-only gated-autonomy pattern used in coding assistants, sequential chains, routers, supervisor/manager patterns, planner-executor-critic loops, graph/state-machine designs, swarm/handoff patterns, blackboard/shared-workspace patterns, and debate/review-committee patterns each have at least one recognizable production analogue.
+
+Framework choice is better understood as a control-plane decision than a coding-style preference: the real evaluation criteria are state and checkpointing support, human-approval integration, the tool-execution model, and observability — not raw popularity. Two adjacent but distinct concerns are worth keeping separate: a tool/data-connectivity protocol gives an agent access to external systems, while a cross-agent communication protocol lets agents talk to each other — neither one, by itself, provides policy enforcement or failure handling; those still have to be architected explicitly. A resilience test with named fault injections (a missing required document, a conflicting policy, a tool timeout, a prompt-injection attempt, an unauthorized request, a skipped approval step, an agent stuck in a loop, a high-confidence wrong answer) and a measurable pass criterion for each is what proves an orchestration design holds up under realistic failure, not just happy-path demos.
+
+At the organizational level, orchestration and framework choices are governance and margin levers, not engineering trivia: a tight, repeatable operating loop — shadow the existing process, prioritize the highest-value automation, build it, generalize the pattern, ship it — can compress a multi-day manual workflow (like a lengthy capital-allocation review) down to minutes when the underlying orchestration is well-governed.`,
+  keyPoints:[
+    `Ten orchestration patterns each matched to a real production case study — lead-agent-plus-parallel-subagents, draft-PR-only gated autonomy, and others`,
+    `Framework choice reframed as "a control-plane decision, not a coding preference" — evaluated on state/checkpointing, human approval support, tool execution model, observability`,
+    `Tool/data-connectivity protocols and cross-agent communication protocols are distinct concerns — neither alone provides policy enforcement or failure handling`,
+    `A resilience test defines named fault injections (missing document, conflicting policy, tool timeout, prompt injection, unauthorized request, skipped approval, agent loop, high-confidence wrong answer) each with a measurable pass criterion`,
+    `Orchestration and framework choices function as governance and margin levers at the organizational level — a well-governed operating loop can compress a multi-day manual workflow down to minutes`,
+  ],
+},
+
+"day-19": {
+  module:`DK-06`, kind:`topic`,
+  title:`Data Discovery · Semantic Layers · Knowledge Graphs · Data Architecture Decisions`,
+  topics:[`Data Discovery`,`Semantic Layers`,`Knowledge Graphs`,`Data Architecture Decisions`],
+  status:`deck`,
+  diagram:{type:`ladder`, caption:`The five-rung data-architecture decision ladder — climb one rung only when a named question fails at the rung below`, rungs:[`Pure retrieval`,`+ Metadata`,`+ Semantic layer`,`Knowledge graph`,`Hybrid + router`]},
+  sourceDecks:[{name:`FORGE FDE-Day-20-Data_Discovery_Semantic_Layers_KG 1-Deck.pdf`, href:`sources/day20/1784487159120-FORGE FDE-Day-20-Data_Discovery_Semantic_Layers_KG 1-Deck.pdf`}],
+  explanation:`Before any data architecture decision, four discovery questions need honest answers: does the data exist, is it usable, is it governed, and what's missing — profiled with data-profiling tooling and enforced with automated data-quality expectations. Schema-on-write, schema-on-read, and data contracts are three different ways of paying what might be called the "structure tax," and real systems typically use all three, applied to different zones of the same data estate rather than picking one universally.
+
+A semantic layer — sitting between raw data and the tools that consume it — fixes metric-definition drift by serving one governed definition of each business metric to dashboards and language-model agents alike, which is what stops text-to-SQL systems from confidently hallucinating a plausible-but-wrong number. Knowledge graphs, representing entities, relationships, and an explicit ontology, outperform plain retrieval-augmented generation on three structural boundaries retrieval cannot cross on its own: multi-hop reasoning across multiple linked facts, entity resolution (recognizing that two different mentions refer to the same real-world thing), and provenance — a reproducible derivation path for an answer, not just a citation. A five-rung decision ladder — pure retrieval, retrieval plus metadata, retrieval plus a semantic layer, a knowledge graph, and a hybrid approach with a routing layer — should only be climbed one rung at a time, and only when a specific, named question fails at the rung below it. A contract-compliance scenario with a large fraction of unstructured agreements, for instance, is rarely solved by retrieval alone: it typically needs text questions routed to hybrid retrieval, numeric/metric questions routed to a semantic layer, and relationship questions routed to a knowledge graph, all assembled behind one provenance-producing router.`,
+  keyPoints:[
+    `Four discovery questions before any architecture: does the data EXIST, is it USABLE, is it GOVERNED, what's MISSING — profiled and enforced with automated data-quality tooling`,
+    `Schema-on-write, schema-on-read, and data contracts each answer "who pays for structure, and when" — real systems use all three by zone`,
+    `A semantic layer stops text-to-SQL hallucination by serving one governed metric definition to dashboards and LLM agents alike`,
+    `Knowledge graphs beat plain retrieval on three structural boundaries: multi-hop reasoning, entity resolution, and provenance`,
+    `A five-rung decision ladder (retrieval → +metadata → +semantic layer → knowledge graph → hybrid+router) is climbed only when a named question fails at the rung below`,
+    `A contract-compliance scenario with mostly unstructured agreements is rarely solved by retrieval alone — it needs text, numeric, and relationship questions routed to different layers behind one provenance-producing router`,
+  ],
+},
+"day-20": {
+  module:`DK-06`, kind:`topic`,
+  title:`Knowledge Graphs in Practice: Cypher Query Patterns & Architecture Trade-offs`,
+  topics:[`Applied Knowledge Graph Modeling`,`Cypher Query Patterns`,`Architecture Decision Defense`],
+  status:`deck`,
+  diagram:{type:`stack`, caption:`Reference architecture for knowledge-graph-backed systems`, layers:[`Enterprise Sources`,`Ingestion & Entity Resolution`,`Data Platform`,`Ontology / Semantic Layer / Knowledge Graph`,`AI & Retrieval`,`Consumption (dashboards, copilots, agents)`]},
+  sourceDecks:[{name:`Knowledge Graphs 1.pdf`, href:`sources/day19/1784263702446-Knowledge Graphs 1.pdf`},{name:`Knowledge Graphs 2.pdf`, href:`sources/day19/1784263705260-Knowledge Graphs 2.pdf`},{name:`Knowledge Graphs 3.pdf`, href:`sources/day19/1784263707493-Knowledge Graphs 3.pdf`},{name:`Knowledge Graphs 4.pdf`, href:`sources/day19/1784263709815-Knowledge Graphs 4.pdf`}],
+  explanation:`Domain-Driven Design, ontology, semantic layers, and knowledge graphs relate as a chain rather than as interchangeable alternatives: domain modeling establishes the business meaning, an ontology formalizes that meaning into a structured vocabulary, a semantic layer governs how that vocabulary is accessed, and a knowledge graph is one concrete implementation of connected, queryable knowledge built on top of it. This slots into a broader architecture-and-decision chain — SCQA for problem framing, domain modeling, C4 for architecture views, formal specification documents, and an ADR for the final recorded decision — with ontology, semantic layer, and knowledge graph work sitting in the middle as the "semantic and knowledge design" layer. The same chain maps onto a Lean/Six Sigma DMAIC lens for connecting architecture work to governed, measurable improvement: define via SCQA, measure the current-state baseline, analyze via domain modeling and semantic understanding, improve via the resulting architecture and specification, and control via the signed ADR.
+
+A full reference architecture for knowledge-graph-backed systems runs from enterprise source systems through ingestion and entity resolution, into a data platform (lakehouse or warehouse), in parallel with an ontology/semantic-layer/knowledge-graph tier, through an AI and retrieval layer (embeddings, vector search, graph search, hybrid search, re-ranking), out to a consumption layer (dashboards, copilots, agents) — all governed by a single control plane covering glossary, lineage, data quality, classification, entitlements, and audit. Graph database options for the knowledge-graph tier itself include Neo4j, Amazon Neptune, Stardog, and other graph-native or multi-model databases, each with different query-language and scaling trade-offs (Cypher being the most widely adopted graph query language). Every architecture decision made along this chain should ultimately be captured as a formal decision record, with alternatives considered and consequences accepted — that record is what lets the choice be defended to a skeptical technical audience later, not just remembered informally.`,
+  keyPoints:[
+    `DDD → Ontology → Semantic Layer → Knowledge Graph form a chain: business domain modelling informs formal ontology, governed by the semantic layer, implemented by the knowledge graph`,
+    `Broader architecture chain: SCQA → domain modelling → C4 → specification → ADR, with ontology/semantic-layer/knowledge-graph as the "semantic and knowledge design" layer`,
+    `The same chain maps onto Lean/Six Sigma DMAIC to connect architecture work to governed, measurable improvement`,
+    `Reference architecture stack: enterprise sources → ingestion/entity resolution → data platform → ontology/semantic-layer/knowledge-graph → AI & retrieval → consumption, governed by one control plane`,
+    `Graph database options (Neo4j, Amazon Neptune, Stardog, and others) differ in query language and scaling trade-offs — Cypher is the most widely adopted graph query language`,
+    `Every architecture decision along this chain should be captured as a formal decision record so the choice can be defended to a skeptical technical audience later`,
+  ],
+},
+
+"day-10": {
+  module:`DK-07`, kind:`topic`,
+  title:`Evaluation Harnesses, Telemetry & Cost Management for LLM Systems`,
+  topics:[`Evaluation Harness Design`,`LLM Telemetry`,`Cost Management`],
+  status:`deck`,
+  diagram:{type:`grid`, caption:`Four evaluators run in parallel; agreement is the signal`, items:[`Deterministic Code Checker`,`LLM-as-Judge`,`Reference Scorer`,`Human Evaluation`]},
+  sourceDecks:[{name:`FORGE FDE EYGDS-Day-10-Eval_Harness_Production_LLM_Ops.pdf`, href:`sources/day10/1783238232010-FORGE FDE EYGDS-Day-10-Eval_Harness_Production_LLM_Ops.pdf`}],
+  explanation:`Stabilizing a Kubernetes-based deployment ahead of launch benefits from a specific trick: reserving node capacity with low-priority "pause pods" so that real workloads preempt existing capacity in under a minute, instead of waiting five to ten minutes for a brand-new node to spin up via autoscaling. Trust in an LLM pipeline is built through a multi-evaluator harness combining a deterministic code checker, an LLM-as-judge evaluator, a reference scorer measured against a golden test set, and periodic human evaluation — with agreement and disagreement between evaluators tracked using Cohen's Kappa as a chance-corrected drift alarm rather than raw percentage agreement. Golden or reference datasets, paired with regression tests, are what stop quality from silently drifting between releases.
+
+Instrumenting LLM calls with distributed tracing and OpenTelemetry's generative-AI semantic conventions surfaces token counts, custom business events, and p99 latency in ways that ordinary application-performance monitoring simply misses, since it has no concept of "tokens" or "model calls" as first-class units. Four cost-reduction levers matter most in production: prompt caching (a substantial discount on cached input tokens), a smaller-model fallback or tiering strategy for lower-stakes requests, batch-style asynchronous processing for non-latency-sensitive work (typically around half the cost with a multi-hour turnaround), and the provisioned-throughput-versus-pay-as-you-go capacity decision. A frequently overlooked free lever, before touching any of the paid ones: output tokens generally cost several times more than input tokens, so capping maximum output length and preferring structured (JSON) output over free-form prose reduces spend at essentially no cost.`,
+  keyPoints:[
+    `Low-priority "pause pods" reserve node capacity so real workloads preempt in under a minute instead of waiting 5-10 min for autoscaling to spin up a new node`,
+    `Four evaluators (code checker, LLM-as-judge, reference scorer, human) run in parallel; agreement tracked via Cohen's Kappa as a chance-corrected drift alarm`,
+    `Golden/reference sets plus regression tests stop silent quality drift between releases`,
+    `Distributed tracing plus OpenTelemetry GenAI conventions expose token spend, custom events, and p99 latency that ordinary APM misses`,
+    `Four cost levers: prompt caching, smaller-model fallback/tiering, batch-style processing (~50% off, multi-hour turnaround), and provisioned-throughput vs. pay-as-you-go (validated on real telemetry)`,
+    `Capping output tokens (several times the cost of input) and preferring structured JSON output over free-form prose is a free cost lever before touching caching or capacity`,
+  ],
+},
+"day-15": {
+  module:`DK-07`, kind:`topic`,
+  title:`Container Deployment, CI/CD & LLMOps Pipelines`,
+  topics:[`Container App Deployment`,`CI/CD for LLM Systems`,`LLMOps Pipeline Design`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`The CI/CD pipeline — an eval gate blocks unsafe deploys`, steps:[`Commit`,`Build`,`Eval Gate`,`Deploy Green (0%)`,`Validate`,`Switch (100%)`]},
+  sourceDecks:[{name:`FORGE FDE EYGDS-Day 15-Container Apps CICD LLMOps-Deck.pdf`, href:`sources/day15/1783871510119-FORGE FDE EYGDS-Day 15-Container Apps CICD LLMOps-Deck.pdf`}],
+  explanation:`Deploying a Python-based agent onto a serverless container platform (scale-to-zero, event-driven autoscaling) rather than a full Kubernetes cluster is the right default for variable-traffic agentic workloads, graduating to a full cluster only once a specific, real constraint demands it. Building the container image with a slim multi-stage build, running as a non-root user, and tagging every image by commit SHA rather than a mutable "latest" tag, pulled via managed identity rather than stored credentials, is baseline hygiene rather than an advanced practice.
+
+A continuous-integration and deployment pipeline authenticated via workload-identity federation (avoiding long-lived deployment credentials entirely) runs build, then an evaluation gate that blocks the deployment outright if scored quality metrics regress by more than a small threshold against the current production baseline, then a blue/green deployment using traffic-weight labels on separate revisions, then a traffic switch once the new revision is validated at zero percent live traffic. Rollback under this model is a single traffic-flip command back to the last-known-good revision — no rebuild required. LLMOps practice extends this same rigor to prompts themselves: treating prompts as versioned registry artifacts (so a prompt rollback is a re-point, not a redeploy) and generating model cards automatically in CI from evaluation results, which conveniently doubles as regulatory documentation for frameworks like the EU AI Act. A well-rehearsed incident runbook for a production quality regression follows a consistent shape: confirm the drop via the evaluation or faithfulness monitor, declare an incident, flip traffic to the last-known-good revision, verify recovery, freeze further deploys, and add the failure case to the golden evaluation set as a permanent regression test.`,
+  keyPoints:[
+    `Choose a serverless container platform for variable-traffic agentic workloads; graduate to a full cluster only when a real constraint demands it`,
+    `Dockerise with a slim multi-stage build, non-root user, tag images by commit SHA (never :latest), pull via managed identity`,
+    `CI/CD pipeline: commit → build → eval gate against a golden set (fail on regression beyond threshold) → deploy green at 0% traffic → validate → switch to 100%`,
+    `Blue/green uses traffic-weight label flips; rollback is a single traffic-flip command to the last-good revision, no rebuild`,
+    `LLMOps: prompts are versioned registry artifacts so rollback is a re-point, not a redeploy; model cards auto-generated in CI double as regulatory documentation`,
+    `Incident runbook: confirm quality drop, declare an incident, flip traffic to last-good revision, verify recovery, freeze deploys, add the failure to the golden set as a permanent regression test`,
+  ],
+},
+"day-29": {
+  module:`DK-07`, kind:`topic`,
+  title:`Production Hardening & CI Evaluation Gates`,
+  topics:[`Production Hardening`,`CI Evaluation Gates`],
+  status:`expert`,
+  diagram:{type:`grid`, caption:`Baseline infrastructure hardening layers`, items:[`Readiness/Liveness Probes`,`Resource Limits`,`Graceful Shutdown`,`Circuit Breakers`]},
+  sourceDecks:[],
+  explanation:`Hardening an AI system for production means systematically removing every point where a happy-path assumption would silently break under real conditions. On the infrastructure side, that means readiness and liveness probes tuned to the actual startup profile of a model-serving process (which can be far slower than a typical web service), resource requests and limits set from observed usage rather than guesses, graceful shutdown handling so in-flight requests complete before a pod terminates, and circuit breakers around every external dependency — the model provider, the vector store, any third-party API — so that a single downstream outage degrades gracefully instead of cascading.
+
+Wiring an evaluation gate into continuous integration turns "we ran the evals once" into a durable quality control: every pull request that touches a prompt, a model choice, a retrieval configuration, or an agent's tool set automatically runs the golden evaluation set, and the pipeline fails the build if any tracked metric regresses beyond an agreed threshold — typically a small percentage against the current production baseline, not a hand-wavy "looks fine." This requires the evaluation set itself to be versioned alongside the code, so a gate failure is reproducible and reviewable rather than a mysterious red X. Combined with load testing at realistic (not average) traffic patterns, chaos testing of the failure modes most likely to occur in practice, and a rehearsed rollback procedure that has actually been executed at least once before go-live, hardening turns a working prototype into a system that fails safely and predictably instead of dramatically.`,
+  keyPoints:[
+    `Hardening means systematically finding and closing every happy-path assumption that would silently break under real production conditions`,
+    `Readiness/liveness probes, resource limits, graceful shutdown, and circuit breakers around every external dependency are baseline infrastructure hardening`,
+    `An evaluation gate wired into CI runs the golden evaluation set on every relevant pull request and fails the build on regression beyond an agreed threshold`,
+    `The evaluation set must be versioned alongside the code so a gate failure is reproducible and reviewable, not a mysterious failure`,
+    `Load testing at realistic (not average) traffic, chaos testing of likely failure modes, and a rollback procedure rehearsed at least once before go-live complete the hardening picture`,
+  ],
+},
+"day-30": {
+  module:`DK-07`, kind:`topic`,
+  title:`Production Telemetry & Cost Dashboards`,
+  topics:[`Production Telemetry`,`Cost Dashboards`],
+  status:`expert`,
+  diagram:{type:`grid`, caption:`What production AI telemetry must capture beyond standard APM`, items:[`Token Counts`,`Retrieval Metrics`,`Tool-Call Outcomes`,`Continuous Eval/Faithfulness Scores`]},
+  sourceDecks:[],
+  explanation:`Production telemetry for an AI system needs to capture more than conventional application metrics: alongside latency, error rate, and throughput, it needs token counts (input and output, separately, since they're priced and behave differently), retrieval metrics (how many chunks were retrieved, at what relevance score), tool-call counts and outcomes, and evaluation or faithfulness scores sampled continuously in production, not just at release time. Structuring these as custom events with consistent attribute naming (following an open telemetry convention for generative AI where possible) means they can be queried and dashboarded alongside standard infrastructure metrics rather than living in a separate, disconnected logging system.
+
+A cost dashboard built on top of this telemetry should answer a small number of concrete questions at a glance: spend per model, per feature, and per customer or tenant if multi-tenant; trend over time against a budget; and which specific requests are the most expensive outliers, since cost in LLM systems is typically dominated by a long tail of unusually large requests rather than being evenly distributed. Alerting on cost the same way latency or error rate is alerted on — a sudden spend spike is often the earliest signal of a bug (an infinite retry loop, a runaway agent, a prompt that grew unexpectedly large) well before it shows up as a user-facing incident. Reviewing this telemetry on a regular cadence, not just when something breaks, is what turns cost and quality from an afterthought into an operating discipline.`,
+  keyPoints:[
+    `Production telemetry for AI systems must capture token counts, retrieval metrics, tool-call outcomes, and continuously-sampled evaluation/faithfulness scores — not just latency/error/throughput`,
+    `Structuring telemetry as consistent custom events (following open generative-AI observability conventions where possible) lets cost/quality data live alongside standard infrastructure metrics`,
+    `A cost dashboard should answer: spend per model/feature/tenant, trend vs. budget, and which specific requests are the most expensive outliers`,
+    `LLM cost is typically dominated by a long tail of unusually large requests, not evenly distributed — outlier detection matters more than averages`,
+    `Alerting on sudden cost spikes often catches bugs (retry loops, runaway agents, oversized prompts) before they become user-facing incidents`,
+    `Reviewing cost and quality telemetry on a regular cadence — not only when something breaks — is what makes it an operating discipline rather than an afterthought`,
+  ],
+},
+"x-02": {
+  module:`DK-07`, kind:`reference`,
+  title:`Quality gates & acceptance criteria discipline`,
+  topics:[`Quality Gates & Acceptance Criteria`],
+  status:`notes`,
+  diagram:{type:`pipeline`, caption:`Gates connect the full delivery pipeline end to end`, steps:[`Specification`,`Implementation`,`Test / Eval`,`Review`,`Release`]},
+  sourceDecks:[{name:`x-02-quality-gates-acceptance-criteria.md`, href:`delivery-kit/modules/DK-07-delivery-ops-llmops/artifacts/topics/x-02-quality-gates-acceptance-criteria.md`, note:`reference note — shared across modules, not tied to a single source deck`}],
+  explanation:`Quality gates are non-optional progression controls that block unsafe advancement between stages or releases, spanning evaluation, tests, policy checks, and human review as needed — never eval alone. Acceptance criteria only count as real when they're testable: a specification's acceptance criteria and a system's automated evaluation suite are complementary layers, not redundant duplicates of each other. Waivers to a gate must be explicit, owned by a named person, and time-bounded — an open-ended or silent waiver defeats the purpose of having a gate at all. Gates connect the full delivery pipeline end to end: specification, implementation, test/evaluation, review, and release, reinforcing the same governance discipline at every stage rather than only at the very end.`,
+  keyPoints:[
+    `Quality gates block unsafe progression between stages/releases; treat gates as product, not paperwork`,
+    `Acceptance criteria must be testable to be real — map AC directly to tests/evals`,
+    `Gates span eval, tests, policy, and human review as needed, not eval alone`,
+    `Waivers are explicit, owned, and time-bounded — no silent skips or permanent advisory-only gates`,
+    `Spec AC and CI evals are complementary controls, not redundant duplicates`,
+  ],
+},
+
+"day-18": {
+  module:`DK-08`, kind:`topic`,
+  title:`Lean & DMAIC for Process Discovery · Waste Elimination`,
+  topics:[`Lean & DMAIC Methodology`,`Waste Elimination`,`Process Discovery`],
+  status:`deck`,
+  diagram:{type:`cycle`, caption:`The DMAIC continuous-improvement cycle`, steps:[`Define`,`Measure`,`Analyze`,`Improve`,`Control`]},
+  sourceDecks:[{name:`Lean_-_DMAIC.pdf`, href:`sources/day18/1784179827483-Lean_-_DMAIC.pdf`}],
+  explanation:`Lean and DMAIC (Define, Measure, Analyze, Improve, Control) form a continuous-improvement spine that runs underneath discovery, framing, design, decision-making, and delivery: rather than being confined to one stage, the full cycle is applied wherever waste needs to be found and removed. Process discovery under this lens means directly observing real workflows, mapping the current state, and identifying handoffs, delays, and rework rather than working from an idealized process diagram. Automating a broken process with AI does not fix it — it scales the existing waste faster and with more confidence.
+
+The eight classical Lean wastes (overproduction, waiting, transport, over-processing, inventory, motion, defects, non-utilized talent) translate directly into AI-specific manifestations: overproduction becomes unused reports or model outputs nobody reads, non-utilized talent becomes subject-matter experts doing manual checks that should be exception-handling only. Generative AI systems introduce eight further wastes with no classical-Lean equivalent: token waste (paying for context nobody needed), retrieval waste (fetching irrelevant chunks), model waste (using a larger, more expensive model than the task requires), human-review waste (reviewing outputs that didn't need review), evaluation waste (testing things nobody will act on), integration waste, context waste, and observability waste (collecting telemetry nobody looks at). Naming and measuring these wastes before automating, orchestrating, or scaling a workflow is what keeps "improvement" honest rather than aspirational.`,
+  keyPoints:[
+    `Lean & DMAIC forms a continuous-improvement spine across the full delivery lifecycle: discovery, framing, design, decision-making, and delivery`,
+    `DMAIC cycle (Define, Measure, Analyze, Improve, Control) drives continuous identification and elimination of non-value-add work — applied as a full cycle wherever waste needs removing, not split across stages`,
+    `8 classic Lean wastes (DOWNTIME) are reframed for AI systems, e.g. overproduction = unused reports/model outputs, non-utilised talent = experts doing manual checks that should be exceptions only`,
+    `8 AI-specific wastes extend Lean: token, retrieval, model, human-review, evaluation, integration, context, and observability waste`,
+    `Automating a broken process with AI scales the existing waste rather than fixing it — measure before automating`,
+  ],
+},
+"day-23": {
+  module:`DK-08`, kind:`topic`,
+  title:`Discovery Integration & Stakeholder Mapping`,
+  topics:[`Discovery Integration`,`Stakeholder Mapping`],
+  status:`expert`,
+  diagram:{type:`quadrant`, caption:`Stakeholder mapping by influence and interest`, xLabel:`Influence: Low → High`, yLabel:`Interest: Low → High`, cells:[
+    {t:`Keep Informed`, d:`High interest, lower influence — a source of ground-truth detail`},
+    {t:`Manage Closely`, d:`High influence, high interest — the core decision-makers`},
+    {t:`Monitor`, d:`Lower influence and interest — light-touch engagement`},
+    {t:`Keep Satisfied`, d:`High influence, lower interest — can block if ignored`},
+  ]},
+  sourceDecks:[],
+  explanation:`Discovery integration means treating discovery as an ongoing synthesis activity rather than a one-time documentation exercise completed at the start of an engagement and then filed away. Findings from interviews, workflow observation, data profiling, and stakeholder conversations need to be continuously reconciled against each other as new information arrives — a workflow described in an early interview often turns out to be incomplete or outdated once it's checked against system logs or a second stakeholder's account, and treating the first version as final is a common source of downstream rework.
+
+Stakeholder mapping plots the people who matter to a decision along two axes — influence (how much power they have over the outcome) and interest (how much the outcome affects them) — producing four broad groups that each need a different engagement strategy: manage closely (high influence, high interest), keep satisfied (high influence, lower interest, but capable of blocking if ignored), keep informed (high interest, lower direct influence, but a source of ground-truth detail and future advocacy), and monitor (lower influence and interest, light-touch engagement). Crucially, different stakeholders frequently define "success" differently for the same initiative — a compliance stakeholder's success criteria and an operations stakeholder's success criteria for the same AI system are rarely identical, and surfacing that divergence early, rather than discovering it at sign-off, is one of the highest-leverage things a structured stakeholder map does. The real problem behind a request is also frequently different from the stated problem — mapping stakeholders explicitly and asking each one what they'd consider a failure, not just a success, tends to surface that gap faster than open-ended discovery interviews alone.`,
+  keyPoints:[
+    `Discovery is continuous synthesis, not a one-time documentation exercise — new information should actively update earlier findings, not just append to them`,
+    `Stakeholder mapping plots people by influence and interest into four groups: manage closely, keep satisfied, keep informed, monitor — each needs a different engagement strategy`,
+    `Different stakeholders routinely define "success" differently for the same initiative — surfacing that divergence early avoids conflict at sign-off`,
+    `The stated problem and the real problem are frequently different — asking stakeholders what would count as failure, not just success, tends to surface the gap faster`,
+    `A stakeholder map should be revisited as the engagement progresses, not drawn once and treated as permanent`,
+  ],
+},
+"day-24": {
+  module:`DK-08`, kind:`topic`,
+  title:`Stakeholder Communication: Minto Pyramid & SCQA Frameworks`,
+  topics:[`Minto Pyramid Principle`,`SCQA for Stakeholder Communication`,`Multi-Stakeholder Simulation`],
+  status:`deck`,
+  diagram:{type:`pyramid`, caption:`The Minto Pyramid — conclusion first, then MECE support`, levels:[`Main Conclusion`,`Supporting Point`,`Supporting Point`,`Evidence & Data (3-7 MECE points)`]},
+  sourceDecks:[{name:`Minto_Pyramid_Principle_&_SCQA.pdf`, href:`sources/day24/1784868257674-Minto_Pyramid_Principle_&_SCQA.pdf`},{name:`The_story_till_now_.pdf`, href:`sources/day24/1784868262552-The_story_till_now_.pdf`},{name:`What_AI_FDE's_do_day-in_&_day-out.pdf`, href:`sources/day24/1784868264849-What_AI_FDE's_do_day-in_&_day-out.pdf`}],
+  explanation:`Structuring an argument for a stakeholder audience benefits from two complementary frameworks. The Minto Pyramid Principle leads with the main conclusion first, then supports it with three to seven points that are mutually exclusive and collectively exhaustive (MECE), each backed by concrete evidence — the opposite of building up to a conclusion gradually, which tends to lose a busy stakeholder's attention before the point lands. SCQA (Situation, Complication, Question, Answer) complements this by structuring the narrative that leads into the recommendation: what's true today, what's changed or gone wrong, what decision is actually being asked, and the recommended answer.
+
+Consolidated field experience across discovery-and-analysis, stakeholder-and-decision-management, and governance-and-delivery-excellence surfaces a consistent set of lessons: discovery is integration, not documentation; every stakeholder defines success differently, and the real problem is frequently hidden behind the stated one; stakeholder management is best treated as continuous risk management rather than a one-time alignment exercise, and alignment (genuine shared understanding) is a higher bar than mere agreement (no one objecting in the room); AI projects fail more often from people and organizational dynamics than from the underlying technology; every deliverable should tell one coherent story rather than presenting disconnected facts; and governance, properly designed, functions as an enabler of speed and trust rather than a constraint on it. Rehearsing these principles in a realistic multi-person simulation — where several stakeholders with genuinely different, sometimes conflicting priorities are all in the room at once — builds the negotiation and synthesis skill that a one-on-one interview never fully tests.`,
+  keyPoints:[
+    `Minto Pyramid Principle: lead with the main conclusion, then support with 3-7 MECE key points backed by evidence`,
+    `SCQA framework (Situation, Complication, Question, Answer) structures the narrative that leads into a recommendation`,
+    `Discovery is integration, not documentation; every stakeholder defines success differently; the real problem is often hidden behind the stated one`,
+    `Stakeholder management is continuous risk management, not a one-time exercise; alignment (genuine shared understanding) is a higher bar than mere agreement`,
+    `AI initiatives fail more often from people and organizational dynamics than from the underlying technology; every deliverable should tell one coherent story`,
+    `Rehearsing these principles in a multi-person simulation with genuinely conflicting priorities builds negotiation skill that one-on-one interviews don't fully test`,
+  ],
+},
+"x-06": {
+  module:`DK-08`, kind:`reference`,
+  title:`Structured feedback & retrospective loops`,
+  topics:[`Feedback Loop Design`],
+  status:`notes`,
+  sourceDecks:[{name:`x-06-coaching-feedback-loops.md`, href:`delivery-kit/modules/DK-08-process-and-lean-discovery/artifacts/topics/x-06-coaching-feedback-loops.md`, note:`reference note — not tied to a single source deck`}],
+  explanation:`Turning feedback into real improvement requires converting it into owned backlog items and process changes rather than leaving it as informal, half-remembered advice passed along verbally. The key discipline is separating advice that was given from actions that were actually agreed to — plenty of feedback gets offered in a conversation that nobody commits to acting on, and conflating the two creates false confidence that something changed. Assigning a clear owner and a target date to each agreed action is what converts feedback into a real commitment rather than a good intention, and revisiting those prior actions at the next feedback touchpoint — rather than only generating new feedback each time — is what closes the loop and builds a track record of follow-through.`,
+  keyPoints:[
+    `Feedback becomes improvement only when it's converted into owned, dated backlog items — not left as informal, half-remembered advice`,
+    `Separate advice that was offered from actions that were actually agreed to; conflating the two creates false confidence that something changed`,
+    `A clear owner and target date turn feedback into a real commitment, not just a good intention`,
+    `Revisit prior agreed actions at the next feedback touchpoint to close the loop, rather than only generating new feedback each time`,
+    `Capture feedback as a structured action log, not a raw transcript`,
+  ],
+},
+
+"day-22": {
+  module:`DK-09`, kind:`topic`,
+  title:`Responsible AI · ISO 42001 · EU AI Act · DPDP · Governance-by-design`,
+  topics:[`Responsible AI`,`ISO 42001`,`EU AI Act`,`DPDP`,`Governance-by-design`],
+  status:`deck`,
+  diagram:{type:`compare`, caption:`Three complementary, non-interchangeable frameworks`, columns:[
+    {h:`ISO 42001`, items:[`Voluntary, certifiable`,`Management-system standard`,`Assesses the organization`,`Governance operating system`]},
+    {h:`EU AI Act`, items:[`Binding regulation`,`Classifies systems by risk`,`Assesses a specific system`,`Enforceable, phased obligations`]},
+    {h:`DPDP`, items:[`Binding law (India)`,`Consent-based data protection`,`Applies to data fiduciaries`,`Governs personal data, not AI per se`]},
+  ]},
+  sourceDecks:[{name:`ISO_42001_&_EU_AI_Act.pdf`, href:`sources/day22/1784697105377-ISO_42001_&_EU_AI_Act.pdf`},{name:`ISO_42001.pdf`, href:`sources/day22/1784697109374-ISO_42001.pdf`, note:`standards text, sampled`},{name:`EU_AI_Act.pdf`, href:`sources/day22/1784697112308-EU_AI_Act.pdf`, note:`legal text, sampled`}],
+  explanation:`ISO/IEC 42001:2023 and the EU AI Act are complementary but distinct instruments, and conflating them is a common and costly mistake. ISO 42001 is a voluntary, certifiable management-system standard — effectively an AI governance operating system covering policy, leadership, risk and impact assessment, lifecycle controls, supplier governance, audits, and continual improvement. The EU AI Act, by contrast, is a binding regulation that legally classifies AI systems by risk tier and imposes enforceable obligations on providers, deployers, importers, distributors, and providers of general-purpose AI models. A system can be internally classified "high-risk" under an organization's own ISO 42001-driven risk criteria while being legally "low-risk" under the Act, or vice versa — legal classification and internal risk assessment are evaluated separately and must not be conflated. The Act's obligations are phased in over several years: prohibited practices and AI-literacy requirements first, governance and general-purpose-model obligations next, most remaining provisions and deployer duties after that, and finally obligations for stand-alone high-risk systems under its riskiest use-case category.
+
+India's Digital Personal Data Protection Act, 2023 (DPDP) adds a third, distinct layer relevant to any AI system that processes personal data of individuals in India: it is a consent-based data-protection law, not an AI-specific regulation, but it directly constrains how training data, retrieval corpora, and user inputs containing personal data can be collected, processed, and retained. Its core obligations fall on "data fiduciaries" (the equivalent of a data controller): processing personal data only on the basis of explicit, informed consent or a defined "legitimate use" exception, honoring data-principal rights (access, correction, erasure, and grievance redressal), implementing "reasonable security safeguards," notifying the Data Protection Board of India and affected individuals of a personal-data breach, and observing restrictions on cross-border data transfer that the government may specify by notification. Significant data fiduciaries — those processing data at a scale or sensitivity the government designates — face additional obligations including a data protection officer, independent data audits, and data protection impact assessments. Non-compliance carries substantial financial penalties set by the Act. For an AI system, DPDP means consent and purpose-limitation have to be designed in at the data-ingestion layer, well before a model is ever trained or a retrieval index is ever built — retrofitting consent after the fact is far more expensive than designing for it from the start.
+
+Taken together, the recommended posture is to run an AI governance program using ISO 42001 as the operating system, meet the EU AI Act's binding obligations for systems in scope of that regulation, and satisfy DPDP's consent and data-handling obligations for any system touching personal data connected to India — three complementary layers, not interchangeable substitutes for one another.`,
+  keyPoints:[
+    `ISO/IEC 42001 = a certifiable AI management-system standard (the governance operating system); EU AI Act = binding regulation classifying systems and imposing enforceable obligations; DPDP = India's consent-based personal-data-protection law`,
+    `A system's internal/ISO risk classification and its legal classification under the EU AI Act are assessed separately and can differ — don't conflate them`,
+    `DPDP obligations fall on "data fiduciaries": consent or a legitimate-use basis for processing, data-principal rights (access, correction, erasure, grievance redressal), reasonable security safeguards, and breach notification to the Data Protection Board of India`,
+    `DPDP has no AI-specific carve-out — training data, retrieval corpora, and user inputs containing personal data of individuals in India all fall under it`,
+    `Consent and purpose-limitation need to be designed in at the data-ingestion layer — retrofitting DPDP compliance after training or indexing is far more expensive`,
+    `EU AI Act obligations are phased: prohibited practices & AI-literacy first, governance & general-purpose-model obligations next, most remaining provisions & deployer duties after that, stand-alone high-risk systems last`,
+    `Recommended posture: ISO 42001 runs the governance program, the EU AI Act meets binding regulatory requirements in scope, DPDP governs personal-data handling connected to India — three complementary layers`,
+  ],
+},
+"day-25": {
+  module:`DK-09`, kind:`topic`,
+  title:`AI Security, Threat Modelling & the OWASP LLM Top 10`,
+  topics:[`AI Security`,`Threat Modelling`,`OWASP LLM Top 10`,`Guardrails`],
+  status:`expert`,
+  diagram:{type:`stack`, caption:`Guardrails work in layers — no single layer is sufficient alone`, layers:[`Input Guardrails`,`Output Guardrails`,`Tool Guardrails`,`Human-in-the-Loop Gate`]},
+  sourceDecks:[],
+  explanation:`Threat modeling an AI system starts from the same discipline as any other system — identify assets, entry points, and trust boundaries, then reason about what could go wrong at each one — but generative AI introduces a genuinely new attack surface: the model's own instruction-following behavior. Prompt injection is the paradigm case: an attacker embeds instructions inside content the system will process (a document, a webpage, an email, a tool's output) that the model then follows as if they came from the legitimate user or operator, potentially overriding the system's actual instructions.
+
+The OWASP Top 10 for Large Language Model Applications names the most common and highest-impact risk categories: prompt injection, sensitive information disclosure (a model revealing training data, system prompts, or other users' data), supply-chain vulnerabilities (compromised models, datasets, or plugins), data and model poisoning (corrupting training or fine-tuning data to implant a backdoor or bias), improper output handling (treating model output as trusted input to a downstream system without validation — the LLM-era equivalent of a classic injection vulnerability), excessive agency (a system granted more autonomy, permissions, or tool access than the task requires), system prompt leakage, vector and embedding weaknesses in retrieval-augmented systems, misinformation presented with false confidence, and unbounded consumption (resource or cost exhaustion attacks against the model-serving layer).
+
+Guardrails address these risks in layers, and no single layer is sufficient alone: input guardrails filter or flag suspicious content before it reaches the model, output guardrails validate and filter what the model produces before it reaches a user or a downstream system, tool guardrails constrain what actions an agent is actually permitted to take regardless of what it "decides" to do, and human-in-the-loop gates require explicit approval before any high-consequence action executes. Treating output handling with the same rigor as any other untrusted input — never directly executing, rendering, or acting on raw model output — and constraining agent permissions to the minimum the task requires, closes most of the highest-impact items on the list without needing exotic defenses.`,
+  keyPoints:[
+    `Threat modeling an AI system follows standard practice (assets, entry points, trust boundaries) plus one genuinely new surface: the model's own instruction-following behavior`,
+    `Prompt injection — attacker instructions embedded in content the model processes, followed as if legitimate — is the paradigm AI-specific attack`,
+    `OWASP LLM Top 10 covers: prompt injection, sensitive information disclosure, supply-chain vulnerabilities, data/model poisoning, improper output handling, excessive agency, system prompt leakage, vector/embedding weaknesses, misinformation, unbounded consumption`,
+    `Improper output handling is the LLM-era equivalent of classic injection vulnerabilities — never treat model output as trusted input to a downstream system without validation`,
+    `Guardrails work in layers — input, output, tool, and human-in-the-loop — and no single layer is sufficient alone`,
+    `Constraining agent tool permissions to the minimum the task requires closes most high-impact risks without needing exotic defenses`,
+  ],
+},
+"x-04": {
+  module:`DK-09`, kind:`reference`,
+  title:`HITL / authority boundaries (advisory vs execution)`,
+  topics:[`HITL & Authority Boundaries`],
+  status:`notes`,
+  diagram:{type:`pipeline`, caption:`The core HITL gate pattern — every decision logged`, steps:[`System Recommendation`,`Policy Check`,`Human Decision`,`Execute (if allowed)`]},
+  sourceDecks:[{name:`x-04-hitl-authority-boundaries.md`, href:`delivery-kit/modules/DK-09-trust-risk-security/artifacts/topics/x-04-hitl-authority-boundaries.md`, note:`reference note — not tied to a single source deck`}],
+  explanation:`Human-in-the-Loop (HITL) requires documented human judgment before any material system outcome, with the advisory-vs-execution boundary written explicitly rather than left implied. Named roles must hold approval authority, with segregation of duties applied where appropriate, and "excessive agency" (a system doing more than its authorized boundary) is flagged as a design smell. The core pattern is a gate: system recommendation → policy check → human decision → system execution only if allowed, with every decision logged.`,
+  keyPoints:[
+    `HITL = required human judgment before material outcomes; the recommend-vs-decide boundary must be written, not implied`,
+    `Named individuals/roles hold approval authority; segregation of duties may apply for higher-risk actions`,
+    `Excessive agency (system acting beyond its authorized boundary) is a design smell to catch in review`,
+    `Core pattern: Recommend → Policy check → Human decide → Execute (if allowed), with the decision logged`,
+    `Connects downstream to specs & ADRs, and pairs with AI security reviews and responsible-AI governance work`,
+  ],
+},
+
+"day-26": {
+  module:`DK-10`, kind:`topic`,
+  title:`Spec-Driven Development: Specs as Source of Truth`,
+  topics:[`Spec-Driven Development`,`Specs as Source of Truth`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`Traceability: every requirement maps to a verifying criterion`, steps:[`Functional Requirement`,`Business Rule`,`Acceptance Criterion`,`Test`]},
+  sourceDecks:[{name:`visionscan-pos-spec.md`, href:`sources/day26/visionscan-pos-spec.md`},{name:`Spec-Driven-Development-Techademy.pdf`, href:`sources/day26/Spec-Driven-Development-Techademy.pdf`},{name:`VisionScan-POS-SDD-Techademy.pdf`, href:`sources/day26/VisionScan-POS-SDD-Techademy.pdf`}],
+  explanation:`A software design document worked through in full — purpose and scope, architectural principles, numbered functional requirements, a data model, a complete API specification, numbered business rules, error-handling contracts, and numbered acceptance criteria — demonstrates spec-driven development as an executable discipline rather than an abstract ideal. A camera-based retail checkout system spec, for instance, encodes edge-case behavior precisely rather than leaving it to implementer judgment: matching priority follows an exact match, then an alias match, then a fuzzy match, in that order; checkout is a single atomic transaction; a stock shortfall blocks the transaction rather than silently partial-fulfilling it. Architectural principles constrain layering explicitly — a frontend never talks to a database directly, a backend owns all business logic — which prevents architecture decisions from being made ad hoc, one pull request at a time.
+
+A standard error envelope and an HTTP status-code table make error handling itself a first-class part of the specification rather than an afterthought discovered during implementation. The most important discipline in spec-driven development is traceability: every functional requirement should be traceable to a specific verifying acceptance criterion, and every acceptance criterion should map back to a specific requirement. A traceability matrix makes gaps visible rather than hidden — a requirement with no covering acceptance criterion, an underspecified threshold, an undefined validation rule, an implicit trust assumption smuggled in by leaving something out of scope — and treating each of those gaps as a defect in the spec itself, to be closed before implementation starts, is what makes a specification genuinely the source of truth rather than aspirational documentation that implementation quietly diverges from.`,
+  keyPoints:[
+    `A worked software design document (functional requirements, data model, API spec, business rules, error contracts, acceptance criteria, all numbered) is spec-driven development as an executable discipline, not an ideal`,
+    `Architectural principles constrain layering: frontend never touches the database directly, backend owns all business logic`,
+    `Business rules encode edge-case behavior precisely (e.g. matching priority exact > alias > fuzzy; checkout is one atomic transaction)`,
+    `A standard error envelope and HTTP-code table make error handling itself part of the spec, not an afterthought`,
+    `A traceability matrix verifies every requirement has a covering acceptance criterion, and calls out where it doesn't`,
+    `Non-functional requirements (latency, coverage %, structured logging) are specified as testable targets alongside functional ones`,
+  ],
+},
+"day-27": {
+  module:`DK-10`, kind:`topic`,
+  title:`Spec Quality & Peer Review Practices`,
+  topics:[`Spec Quality Criteria`,`Peer Spec Review`,`Agentic Coding Workflows`],
+  status:`expert`,
+  diagram:{type:`grid`, caption:`The five checkable properties of a good spec`, items:[`Unambiguous`,`Testable`,`Complete`,`Internally Consistent`,`Explicitly Scoped`]},
+  sourceDecks:[],
+  explanation:`A good specification has a small number of concrete, checkable properties rather than being a vague notion of "thoroughness." It should be unambiguous (a reader with no other context arrives at the same interpretation every time), testable (every requirement maps to a concrete acceptance criterion that can pass or fail), complete enough to build from without guessing at intent, internally consistent (no contradicting requirements), and appropriately scoped — explicitly stating what's out of scope is often as valuable as stating what's in.
+
+Peer review of a specification catches a different class of problem than self-review: a reviewer unfamiliar with the author's assumptions is far more likely to notice a term used inconsistently, an edge case left unaddressed, or an implicit assumption that was never actually written down. A useful review checklist asks, for every requirement: is there a test for this, does this contradict anything else in the document, does this term mean the same thing everywhere it appears, and is the "why" behind this requirement clear enough that a future reader could evaluate whether it still applies.
+
+Working with an AI coding agent against a written specification changes the review loop in a specific way: because the agent will interpret ambiguity by picking something plausible rather than stopping to ask, an ambiguous spec doesn't fail loudly during implementation — it produces working-looking code that quietly does the wrong thing. Reviewing a spec before handing it to an agent, rather than reviewing only the code the agent produces afterward, catches these problems while they're still cheap to fix. Structuring the interaction as small, verifiable steps — implement one requirement, run its acceptance criteria, confirm, move to the next — keeps an agentic coding workflow anchored to the spec throughout, rather than drifting into a large, hard-to-review diff built on an initial misreading.`,
+  keyPoints:[
+    `A good spec is unambiguous, testable, complete enough to build from, internally consistent, and explicitly scoped (including what's out of scope)`,
+    `Peer review catches what self-review misses: a reviewer unfamiliar with the author's assumptions notices inconsistent terms and unwritten assumptions`,
+    `Review checklist per requirement: is there a test for this, does it contradict anything else, is the term used consistently, is the "why" clear enough to evaluate later`,
+    `An AI coding agent resolves spec ambiguity by picking something plausible rather than asking — an ambiguous spec fails silently, not loudly`,
+    `Review the spec before handing it to an agent, not just the code the agent produces afterward — it's cheaper to fix ambiguity before implementation`,
+    `Structure agentic coding as small, verifiable steps (implement → verify against acceptance criteria → next) to keep output anchored to the spec`,
+  ],
+},
+"day-28": {
+  module:`DK-10`, kind:`topic`,
+  title:`Production-ising AI-Generated Code & Agentic Coding Workflows`,
+  topics:[`Productionising Generated Code`,`Agentic Coding Workflows`],
+  status:`expert`,
+  diagram:{type:`pipeline`, caption:`A disciplined agentic coding workflow — human checkpoints throughout`, steps:[`Define Task`,`Agent Proposes Approach`,`Review Approach`,`Implement in Increments`,`Run Full Test Suite`]},
+  sourceDecks:[],
+  explanation:`Code produced by an AI coding agent needs the same production bar as any other code, and treating it as pre-approved because it came from a spec-following agent is a common and expensive mistake. Production-ising generated code means running it through the same review, testing, and security scanning as human-written code, checking specifically for patterns an agent is prone to: plausible-looking but subtly wrong logic, missing error handling for cases the spec implied but didn't spell out explicitly, dependencies added without justification, and code that satisfies the letter of an acceptance criterion while missing its evident intent.
+
+A disciplined agentic coding workflow keeps a human in the loop at defined checkpoints rather than either reviewing every line or reviewing nothing: define the task and constraints precisely, let the agent propose an approach before writing code, review the approach before implementation starts, implement in small verifiable increments tied to specific acceptance criteria, and run the full test suite — including tests the agent didn't write — before accepting a change. Version control discipline matters more with agentic workflows, not less: small, well-scoped commits with clear messages make it possible to bisect a regression back to a specific agent-generated change, which is much harder in one large, agent-produced diff. Finally, treating the agent's own confidence as informative but not authoritative — an agent can be fluently, confidently wrong — and verifying claims about what the code does against what it's actually observed to do in tests, is the single highest-leverage habit in working with AI coding agents at production quality.`,
+  keyPoints:[
+    `AI-generated code needs the same production bar as human-written code — review, testing, and security scanning, not a pass because it came from an agent`,
+    `Watch specifically for agent-prone failure patterns: plausible-but-wrong logic, missing implied error handling, unjustified new dependencies, code that meets the letter but not the intent of an acceptance criterion`,
+    `A disciplined workflow keeps a human in the loop at defined checkpoints: define task → agent proposes approach → review approach → implement in small increments → run the full test suite`,
+    `Small, well-scoped commits make it possible to bisect a regression back to a specific agent-generated change`,
+    `Treat an agent's confidence as informative, not authoritative — verify claims about behavior against what tests actually observe`,
+  ],
+},
+"day-31": {
+  module:`DK-10`, kind:`topic`,
+  title:`AI Coding Agent Evaluation Frameworks & FinOps Tracking`,
+  topics:[`Agent Evaluation Framework Design`,`AI Coding FinOps Metrics`],
+  status:`deck`,
+  diagram:{type:`pipeline`, caption:`The reusable evaluation-framework architecture`, steps:[`Brownfield Repo`,`Eval Datasets`,`Adapter`,`Runner`,`Graders + Policies`,`Reports`]},
+  sourceDecks:[{name:`image (1).png`, href:`sources/day31/image (1).png`},{name:`image (2).png`, href:`sources/day31/image (2).png`},{name:`image (3).png`, href:`sources/day31/image (3).png`}],
+  explanation:`Building an evaluation framework for a system under active development by an AI coding agent follows a reusable architecture: a runner orchestrates execution against the target system, an adapter connects the runner to that system without requiring modification to it, evaluation datasets cover normal, edge, adversarial, metamorphic, and outage cases (not just the happy path), graders check the output against defined criteria, policies enforce automatic failure rules, and reports compile results into a reviewable summary. A practical build sequence starts with understanding the existing system, then designing the evaluation dataset across all five case categories, then building the folder structure and the adapter, then implementing deterministic graders, and finally running the full suite once to capture a baseline before making any changes — so that every subsequent change can be measured against a known-good starting point rather than compared informally.
+
+Graders in a well-designed evaluation framework check more than a single expected output: schema correctness, presence of required facts or behaviors, evidence supporting any claim made, absence of prohibited actions, respect for authority and security boundaries, temporal and unit correctness, the trajectory the system took to reach its answer (not just the final answer), and latency. Alongside evaluation, FinOps tracking for AI-assisted development monitors a distinct set of metrics: chat sessions used (revealing fragmented or repeated work), files attached (context scope), agent iterations (a proxy for rework), terminal commands issued (exploration overhead), files modified (change scope), failed attempts (wasted effort), full evaluation-suite runs (validation cost), and task outcome (connecting all of the above back to actual value delivered). Combining usage metrics, efficiency signals, and outcome tracking is what turns AI-coding-agent spend from an opaque number into an actionable operating decision.`,
+  keyPoints:[
+    `Evaluation architecture: a runner drives execution, an adapter connects to the system under test without modifying it, datasets cover normal/edge/adversarial/metamorphic/outage cases, graders check output, policies enforce failure rules, reports summarize results`,
+    `Build sequence: understand the system, design the eval dataset across all case categories, build folder structure and adapter, implement deterministic graders, run once to capture a baseline before any changes`,
+    `Graders should check schema, required facts/behaviors, evidence, prohibited actions, authority/security boundaries, temporal correctness, trajectory (not just final answer), and latency`,
+    `Establishing a baseline evaluation run before making changes is what makes every later comparison measurable rather than informal`,
+    `FinOps tracking for AI-assisted development: sessions used, files attached, agent iterations, terminal commands, files modified, failed attempts, full-suite runs, and task outcome`,
+    `Usage metrics + efficiency signals + outcome tracking together turn AI-coding-agent spend into an actionable operating decision, not an opaque number`,
+  ],
+},
+"x-07": {
+  module:`DK-10`, kind:`reference`,
+  title:`Structured deliverable pattern: narrative → decisions → specs → evidence`,
+  topics:[`Deliverable Traceability Pattern`],
+  status:`notes`,
+  diagram:{type:`pipeline`, caption:`The deliverable spine — one coherent story, not a slide pile`, steps:[`Problem Narrative`,`Design Decisions (ADRs)`,`Specs / Gates`,`Evidence of Outcomes`]},
+  sourceDecks:[{name:`x-07-capstone-artefact-pattern.md`, href:`delivery-kit/modules/DK-10-spec-driven-delivery/artifacts/topics/x-07-capstone-artefact-pattern.md`, note:`reference note — not tied to a single source deck`}],
+  explanation:`A well-structured technical deliverable follows a consistent spine rather than being an unordered pile of slides or documents: a problem narrative explaining why the work matters, the design decisions made along the way (captured as architecture decision records), the resulting specifications and quality gates, and evidence of the outcomes actually achieved. Traceability across these stages — being able to follow a single thread from the original problem statement through to the specific decision, specification, and piece of evidence that resolved it — matters far more than sheer volume of material. A deliverable that integrates the full arc of a project into one coherent story, with governed outcomes and clear evidence discipline throughout, is consistently stronger than one that accumulates disconnected artifacts and presentation polish without that connective thread.`,
+  keyPoints:[
+    `Deliverable spine: problem narrative → design decisions (ADRs) → specifications/quality gates → evidence of outcomes, as one coherent story`,
+    `Evidence and traceability matter more than volume — integrate the full arc of the work, don't pile up disconnected artifacts`,
+    `Being able to trace any single decision back to the problem statement that motivated it is the primary quality signal for a strong deliverable`,
+    `Presentation polish is not a substitute for governed outcomes and evidence discipline`,
+  ],
+},
+};
+
+/* ============================================================
+   Runtime — spine, module cards, topic index, detail panel, deep-linking
+   ============================================================ */
+
+// Build a global topic index: normalized-label -> { label, dayKeys:[] }
+const TOPIC_INDEX = {};
+function slugify(s){
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-+|-+$)/g,'');
+}
+Object.keys(DATA).forEach(dayKey=>{
+  const entry = DATA[dayKey];
+  entry.topics.forEach(label=>{
+    const slug = slugify(label);
+    if(!TOPIC_INDEX[slug]) TOPIC_INDEX[slug] = { label, dayKeys:[] };
+    if(!TOPIC_INDEX[slug].dayKeys.includes(dayKey)) TOPIC_INDEX[slug].dayKeys.push(dayKey);
+  });
+});
+
+const spineEl = document.getElementById('spine');
+const modulesEl = document.getElementById('main-modules');
+const detailEl = document.getElementById('detail');
+
+// ---- Spine ----
+MODULES.forEach((mod, i)=>{
+  const btn = document.createElement('button');
+  btn.className = 'spine-item';
+  btn.id = `spine-${mod.id}`;
+  btn.innerHTML = `<span class="num">${i+1}</span><h3>${mod.name}</h3><p>${mod.blurb}</p>`;
+  btn.addEventListener('click', ()=>{
+    expandModule(mod.id, true);
+  });
+  spineEl.appendChild(btn);
+});
+
+// ---- Module cards ----
+MODULES.forEach((mod, i)=>{
+  const card = document.createElement('section');
+  card.className = 'module-card';
+  card.id = `card-${mod.id}`;
+
+  const header = document.createElement('button');
+  header.className = 'module-header';
+  header.setAttribute('aria-expanded', i===0 ? 'true' : 'false');
+  header.setAttribute('aria-controls', `body-${mod.id}`);
+  header.innerHTML = `
+    <span class="id">${mod.id.replace('DK-','')}</span>
+    <span class="text">
+      <h2>${mod.name}</h2>
+      <p class="sub">${mod.blurb}</p>
+    </span>
+    <span class="count">${mod.days.length} session${mod.days.length>1?'s':''}</span>
+    <span class="chevron">&#9656;</span>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'module-body';
+  body.id = `body-${mod.id}`;
+  if(i!==0) body.hidden = true;
+
+  mod.days.forEach(dayKey=>{
+    const entry = DATA[dayKey];
+    if(!entry) return;
+    const row = document.createElement('div');
+    row.className = 'day-row';
+    row.id = `row-${dayKey}`;
+    row.innerHTML = `<span class="day-title">${entry.title}</span>`;
+    const chips = document.createElement('div');
+    chips.className = 'chips';
+    // unique topics per day row
+    const seen = new Set();
+    entry.topics.forEach(label=>{
+      const slug = slugify(label);
+      if(seen.has(slug)) return;
+      seen.add(slug);
+      const chip = document.createElement('button');
+      chip.className = 'chip' + (entry.status==='pending' ? ' pending' : '');
+      chip.textContent = label;
+      chip.dataset.slug = slug;
+      chip.addEventListener('click', ()=>{ location.hash = slug; });
+      chips.appendChild(chip);
+    });
+    row.appendChild(chips);
+    body.appendChild(row);
+  });
+
+  header.addEventListener('click', ()=>{
+    const expanded = header.getAttribute('aria-expanded') === 'true';
+    header.setAttribute('aria-expanded', String(!expanded));
+    body.hidden = expanded;
+  });
+
+  card.appendChild(header);
+  card.appendChild(body);
+  modulesEl.appendChild(card);
+});
+
+function expandModule(modId, scroll){
+  const header = document.querySelector(`#card-${modId} .module-header`);
+  const body = document.getElementById(`body-${modId}`);
+  if(header && body){
+    header.setAttribute('aria-expanded','true');
+    body.hidden = false;
+  }
+  document.querySelectorAll('.spine-item').forEach(el=>el.classList.remove('active'));
+  const spineBtn = document.getElementById(`spine-${modId}`);
+  if(spineBtn) spineBtn.classList.add('active');
+  if(scroll){
+    const card = document.getElementById(`card-${modId}`);
+    if(card){
+      card.scrollIntoView({behavior:'smooth', block:'start'});
+      card.classList.add('flash');
+      setTimeout(()=>card.classList.remove('flash'), 1000);
+    }
+  }
+}
+
+// ---- Detail panel ----
+// ---- Diagram renderer: turns a small declarative {type, ...} object into HTML/SVG ----
+function renderDiagram(dg){
+  if(!dg) return '';
+  const esc = s => String(s);
+  let body = '';
+  if(dg.type === 'pipeline'){
+    body = `<div class="dg-row">${dg.steps.map((s,i)=>
+      `<span class="dg-step"><span class="dg-box">${esc(s)}</span>${i<dg.steps.length-1 ? `<span class="dg-arrow">&#8594;</span>` : ''}</span>`
+    ).join('')}</div>`;
+  } else if(dg.type === 'cycle'){
+    const row = `<div class="dg-row">${dg.steps.map((s,i)=>
+      `<span class="dg-step"><span class="dg-box">${esc(s)}</span>${i<dg.steps.length-1 ? `<span class="dg-arrow">&#8594;</span>` : ''}</span>`
+    ).join('')}</div>`;
+    const svg = `<div class="dg-cycle-wrap"><svg class="dg-cycle-svg" viewBox="0 0 100 14" preserveAspectRatio="none">
+      <defs><marker id="dgArrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--yellow)"/></marker></defs>
+      <path d="M97,2 Q100,12 50,12 Q0,12 3,2" fill="none" stroke="var(--yellow)" stroke-width="1" stroke-dasharray="2,1.4" marker-end="url(#dgArrow)"/>
+    </svg></div>`;
+    body = row + svg;
+  } else if(dg.type === 'grid'){
+    body = `<div class="dg-grid">${dg.items.map(s=>`<span class="dg-box">${esc(s)}</span>`).join('')}</div>`;
+  } else if(dg.type === 'stack'){
+    body = `<div class="dg-stack">${dg.layers.map((s,i)=>
+      (i>0 ? `<div class="dg-sep">&#8595;</div>` : '') + `<div class="dg-box">${esc(s)}</div>`
+    ).join('')}</div>`;
+  } else if(dg.type === 'ladder'){
+    body = `<div class="dg-ladder">${dg.rungs.map((s,i)=>
+      `<div class="dg-rung" style="margin-left:${i*1.1}rem"><span class="dg-num">${i+1}</span><span class="dg-box">${esc(s)}</span></div>`
+    ).join('')}</div>`;
+  } else if(dg.type === 'quadrant'){
+    const cell = (c,col,row) => `<div class="dg-cell" style="grid-column:${col};grid-row:${row}"><b>${esc(c.t)}</b><span>${esc(c.d)}</span></div>`;
+    body = `<div class="dg-quadrant">
+      <div class="dg-axis-x" style="grid-column:2/4;grid-row:1">${esc(dg.xLabel||'')}</div>
+      <div class="dg-axis-y" style="grid-column:1;grid-row:2/4">${esc(dg.yLabel||'')}</div>
+      ${cell(dg.cells[0],2,2)}${cell(dg.cells[1],3,2)}
+      ${cell(dg.cells[2],2,3)}${cell(dg.cells[3],3,3)}
+    </div>`;
+  } else if(dg.type === 'pyramid'){
+    const n = dg.levels.length;
+    body = `<div class="dg-pyramid">${dg.levels.map((s,i)=>{
+      const w = 38 + (i*(62/(n-1||1)));
+      return `<div class="dg-level${i===0?' l0':''}" style="width:${w}%">${esc(s)}</div>`;
+    }).join('')}</div>`;
+  } else if(dg.type === 'nested'){
+    body = `<div class="dg-nested">${(function build(levels){
+      if(!levels.length) return '';
+      const [head,...rest] = levels;
+      return `<div class="dg-n"><span class="dg-n-label">${esc(head.label)}</span><span class="dg-n-desc">${esc(head.desc)}</span>${build(rest)}</div>`;
+    })(dg.levels)}</div>`;
+  } else if(dg.type === 'compare'){
+    body = `<div class="dg-compare">${dg.columns.map(c=>
+      `<div class="dg-col"><h5>${esc(c.h)}</h5><ul>${c.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`
+    ).join('')}</div>`;
+  } else {
+    return '';
+  }
+  return `<div class="diagram">${dg.caption ? `<p class="diagram-cap">${esc(dg.caption)}</p>` : ''}${body}</div>`;
+}
+
+function renderDetail(slug){
+  const topic = TOPIC_INDEX[slug];
+  if(!topic){
+    detailEl.innerHTML = `<div class="detail-placeholder">Topic not found. Select a topic chip from any module.</div>`;
+    return;
+  }
+  const dayKeys = topic.dayKeys;
+  const appearsInBtns = dayKeys.map(dk=>{
+    const e = DATA[dk];
+    return `<button data-jump="${dk}">${e.title}</button>`;
+  }).join('');
+
+  const blocks = dayKeys.map(dk=>{
+    const e = DATA[dk];
+    const exp = e.status === 'pending'
+      ? `<p class="exp"><em>No source deck is available for this session yet — content summary is pending. See the gap report.</em></p>`
+      : `<p class="exp">${e.explanation}</p>`;
+    const points = e.keyPoints.length
+      ? `<ul>${e.keyPoints.map(k=>`<li>${k}</li>`).join('')}</ul>`
+      : '';
+    const sources = e.sourceDecks.length
+      ? `<div class="sources"><h4>Source</h4><ul>${e.sourceDecks.map(s=>
+          `<li><a href="${encodeURI(s.href)}" download>${s.name}</a>${s.note ? `<span class="src-note">${s.note}</span>` : ''}</li>`
+        ).join('')}</ul></div>`
+      : '';
+    return `<div class="day-block">
+      <h3>${e.title}</h3>
+      ${renderDiagram(e.diagram)}
+      ${exp}
+      ${points}
+      ${sources}
+    </div>`;
+  }).join('');
+
+  detailEl.innerHTML = `
+    <h2>${topic.label}</h2>
+    <div class="appears-in">Appears in: ${appearsInBtns}</div>
+    ${blocks}
+  `;
+
+  detailEl.querySelectorAll('button[data-jump]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const dk = btn.dataset.jump;
+      const modId = DATA[dk].module;
+      expandModule(modId, true);
+    });
+  });
+}
+
+function selectTopic(slug){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active', c.dataset.slug === slug));
+  const topic = TOPIC_INDEX[slug];
+  if(topic && topic.dayKeys.length){
+    const modId = DATA[topic.dayKeys[0]].module;
+    expandModule(modId, false);
+  }
+  renderDetail(slug);
+  if(window.matchMedia('(max-width:900px)').matches){
+    detailEl.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+
+window.addEventListener('hashchange', ()=>{
+  const slug = decodeURIComponent(location.hash.replace('#',''));
+  if(slug) selectTopic(slug);
+});
+
+// ---- Fluid sticky-offset tracking ----
+// header + spine heights change with viewport width (fluid padding/type), so the
+// sticky offsets used by nav.spine, aside.detail and .module-card's scroll-margin
+// are measured at runtime rather than hardcoded, keeping the layout correct at any
+// screen size instead of relying on guessed pixel breakpoints.
+const headerEl = document.querySelector('header.top');
+const spineNavEl = document.querySelector('nav.spine');
+function updateStickyOffsets(){
+  const headerH = headerEl.offsetHeight;
+  const spineH = spineNavEl.offsetHeight;
+  document.documentElement.style.setProperty('--header-h', headerH + 'px');
+  document.documentElement.style.setProperty('--sticky-top', (headerH + spineH) + 'px');
+}
+updateStickyOffsets();
+window.addEventListener('resize', ()=>{
+  clearTimeout(window.__stickyResizeT);
+  window.__stickyResizeT = setTimeout(updateStickyOffsets, 100);
+});
+if(window.ResizeObserver){
+  new ResizeObserver(updateStickyOffsets).observe(headerEl);
+  new ResizeObserver(updateStickyOffsets).observe(spineNavEl);
+}
+
+// Initial load: restore from hash if present
+const initialSlug = decodeURIComponent(location.hash.replace('#',''));
+if(initialSlug && TOPIC_INDEX[initialSlug]){
+  selectTopic(initialSlug);
+} else {
+  document.getElementById('spine-DK-01').classList.add('active');
+}
+</script>
+</body>
+</html>
